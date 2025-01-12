@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-03-22T16:22:35 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Claim-MOTOR-Intimation" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="db53913d-ebb1-4e6b-be47-3a4d45e7bbc1">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<parameter name="parClaimNumber" class="java.lang.String"/>
+	<parameter name="parTotalNetEstimat" class="java.lang.String"/>
+	<parameter name="parTotalDeductible" class="java.lang.String"/>
+	<parameter name="partTotalClaimDetail" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+C1.CLMH_SYS_ID
+,C1.CLMH_COB
+,FN_GET_PRODUCT_DESC(C1.CLMH_COB) AS PRODUCT_DESC
+,C1.CLMH_POLH_SYS_ID
+,C1.CLMH_POLNUM
+,FN_GET_POLICY_FORMAT(C1.CLMH_POLNUM,C1.CLMH_COB,'0') AS POLICY_NUMBER
+,C1.CLMH_CLMNUM
+,C1.CLMH_CAT_LOSS
+,C1.CLMH_GLT_PRCT
+,CASE C1.CLMH_CAT_LOSS 
+		WHEN '99' THEN 'ACCIDENTAL DAMAGE'
+	END AS CAT,
+	CASE C1.CLMH_GLT_PRCT 
+			WHEN '01' THEN 'Insured'
+		WHEN '04' THEN 'Third Party'
+	END AS GUILTY
+,C1.CLMH_NATURE
+,C1.CLMH_COL
+,(SELECT C.COL_DESC FROM RAIMS.INM_MST_COL C WHERE C.COL_INSTYPE='MOTOR' AND C.COL_CODE = C1.CLMH_COL ) AS CATEGORY_OF_LOSS
+,TO_CHAR(C1.CLMH_LOSS_DATE,'DD-MON-YYYY') AS CLMH_LOSS_DATE
+,TO_CHAR(C1.CLMH_REP_DATE,'DD-MON-YYYY') AS CLMH_REP_DATE
+,TO_CHAR(C1.CLMH_TXN_DATE,'DD-MON-YYYY') AS CLMH_TXN_DATE
+,C1.CLMH_REM NARRATION
+,C1.CLMH_PLACE_ACCIDENT
+,C1.CLMH_LNKNUM
+,TO_CHAR(C1.CLMH_CRE_DT,'DD-MON-YYYY') AS  CREATED_DATE
+,TO_CHAR(C1.CLMH_APPROVAL_DT,'DD-MON-YYYY') AS APPROVED_DATE
+,(SELECT U.USER_ID FROM RAIMS.MMGR_USERS U WHERE U.USER_INIT=C1.CLMH_CRE_USER_INIT) AS CREATED_BY
+,(SELECT U.USER_ID FROM RAIMS.MMGR_USERS U WHERE U.USER_INIT=C1.CLMH_APPROVAL_BY) AS APPROVED_BY
+--,C1.* 
+--,C2.CLMF_FTR_NAME
+--,C2.CLMF_EST_FC
+--,C2.CLMF_DED_FC
+,P.POLH_DEBIT_PARTY
+,P.POLH_ASSRDNM
+,TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY') AS POLH_STPERIOD
+,TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') AS POLH_ENDPERIOD
+,C3.PINTMV_REGN_NO
+,C3.PINTMV_MOD_DESC
+--,RIC.CLAPR_SEQ_NO
+--,RIC.CLAPR_TTY_CODE
+--,RIC.CLAPR_TTY_TYPE
+--,FN_GET_RE_INSURANCE_TYPE(RIC.CLAPR_TTY_TYPE) AS RE_TYPE
+--,RIC.CLAPR_TTY_SHARE
+--,RIC.CLAPR_AMT_FC
+--,RIC.CLAPR_AMT_BC
+FROM RAIMS.INT_CLM_HEAD C1
+--INNER JOIN RAIMS.INT_CLM_FEATURE C2 ON C1.CLMH_SYS_ID = C2.CLMF_CLMH_SYS_ID
+INNER JOIN RAIMS.INT_UW_POLH P ON P.POLH_SYS_ID=C1.CLMH_POLH_SYS_ID AND P.POLH_EXTNUM='0'
+INNER JOIN RAIMS.INT_UW_PINT_MOTOR C3 ON C3.PINTMV_REGN_NO=C1.CLMH_REGN_NO
+--INNER JOIN RAIMS.INT_RI_CLM_APPOR RIC ON RIC.CLAPR_CLMNUM=C1.CLMH_CLMNUM
+WHERE 
+--RIC.CLAPR_AMT_BC>0
+--C1.CLMH_CLMNUM='C01CV00200174'
+C1.CLMH_CLMNUM=$P{parClaimNumber}]]>
+	</queryString>
+	<field name="NARRATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="NARRATION"/>
+	</field>
+	<field name="CLMH_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="CLMH_COB" class="java.lang.String"/>
+	<field name="CLMH_POLH_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="CLMH_POLNUM" class="java.lang.String"/>
+	<field name="CLMH_CLMNUM" class="java.lang.String"/>
+	<field name="CLMH_CAT_LOSS" class="java.lang.String"/>
+	<field name="CLMH_GLT_PRCT" class="java.lang.String"/>
+	<field name="CLMH_NATURE" class="java.lang.String"/>
+	<field name="CLMH_COL" class="java.lang.String"/>
+	<field name="CATEGORY_OF_LOSS" class="java.lang.String"/>
+	<field name="CLMH_LOSS_DATE" class="java.lang.String"/>
+	<field name="CLMH_REP_DATE" class="java.lang.String"/>
+	<field name="CLMH_TXN_DATE" class="java.lang.String"/>
+	<field name="CLMH_PLACE_ACCIDENT" class="java.lang.String"/>
+	<field name="CLMH_LNKNUM" class="java.lang.String"/>
+	<field name="POLICY_NUMBER" class="java.lang.String"/>
+	<field name="PRODUCT_DESC" class="java.lang.String"/>
+	<field name="CAT" class="java.lang.String"/>
+	<field name="GUILTY" class="java.lang.String"/>
+	<field name="CREATED_DATE" class="java.lang.String"/>
+	<field name="APPROVED_DATE" class="java.lang.String"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+	<field name="APPROVED_BY" class="java.lang.String"/>
+	<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+	<field name="POLH_ASSRDNM" class="java.lang.String"/>
+	<field name="POLH_STPERIOD" class="java.lang.String"/>
+	<field name="POLH_ENDPERIOD" class="java.lang.String"/>
+	<field name="PINTMV_REGN_NO" class="java.lang.String"/>
+	<field name="PINTMV_MOD_DESC" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="41" splitType="Stretch">
+			<staticText>
+				<reportElement x="170" y="1" width="220" height="40" uuid="4a8a108e-0e4b-4f4d-9c7f-da5a3353be6d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Serif" size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Claim Intimation Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="372" splitType="Stretch">
+			<staticText>
+				<reportElement x="18" y="51" width="131" height="20" uuid="a4748da1-3a4c-4ead-8f01-6e4d5b3d14c0"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Policy Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="71" width="131" height="20" uuid="c7de0c27-c151-4755-96fd-18ff40bb4e3e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agent/Broker]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="11" width="131" height="20" uuid="4a8b11e4-c7a2-409f-b51a-69a1e13a0817"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Claim Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="31" width="131" height="20" uuid="31d29002-15c1-4bfd-8126-46cb96c8505c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="193" width="131" height="20" uuid="10ff3a99-d928-4af7-950e-440035066d15"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Registered]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="153" width="131" height="20" uuid="53d29a59-705f-4657-a9f1-9823b3ecd3f4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Loss]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="173" width="131" height="20" uuid="714357fb-bee1-483b-8d71-dfdb091f760b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date Reported]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="132" width="131" height="20" uuid="57dbc10b-c58f-4d05-93de-c215a2f3f496"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Risk Details]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="111" width="131" height="20" uuid="ff52e6a6-870e-4edd-bb05-512cb3d9fde5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Product]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="91" width="131" height="20" uuid="ad1f5232-28dd-4606-815e-7e133cf0ca4e"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Peroid of Insurance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="296" width="130" height="20" uuid="db6177af-27b3-4b0f-a6a9-4d95d2b0ef5f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Place of Accident/Loss]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="216" width="131" height="20" uuid="ccd3f4ee-b4d1-4595-b16b-1c43e1d59394"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Event]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="256" width="131" height="20" uuid="b335bcc5-28b7-4bba-99b6-0467ff2500fe"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Category of Loss]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="316" width="131" height="20" uuid="f5e51a94-e53f-49d2-954d-f0f8320ef552"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Narration/Remarks]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="276" width="131" height="20" uuid="783eddf2-5147-40f9-b2bc-7f939899f2ae"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Guilty Party]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="18" y="236" width="131" height="20" uuid="a1e3f387-1051-4ec0-892b-0b85cab8d2ba"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Serif" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cause of Loss]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="11" width="320" height="20" uuid="37190d48-062b-462a-b73a-060dc2df9e1b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLMH_CLMNUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="31" width="394" height="20" uuid="89985f2c-d646-41a0-a567-0d361e3b9856"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLH_ASSRDNM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="51" width="394" height="20" uuid="2a6ce8c9-fece-4abb-8bca-3e449416bab0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLICY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="71" width="394" height="20" uuid="a4a89239-be76-455f-8fba-230fea2507d8"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLH_DEBIT_PARTY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="91" width="394" height="20" uuid="1b4c889f-0d1d-4201-8091-5c96ee1b500d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": FROM "+$F{POLH_STPERIOD}+" TO "+$F{POLH_ENDPERIOD}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="111" width="394" height="20" uuid="734eacb0-2547-4d04-b403-afe22feccad7"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{PRODUCT_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="132" width="394" height="20" uuid="206d2ea9-94a1-4aac-b946-b7ad25d5f433"/>
+				<textFieldExpression><![CDATA[": "+$F{PINTMV_REGN_NO} +"        "+$F{PINTMV_MOD_DESC}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="151" width="394" height="22" uuid="59b3159b-3fc4-4f5b-8737-98bd8459699b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLMH_LOSS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="173" width="394" height="20" uuid="788ae82b-eac8-4373-806f-c92facfde19d"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLMH_REP_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="193" width="394" height="20" uuid="db7e1ff8-2510-448e-9445-efed6ee3eb55"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLMH_TXN_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="236" width="394" height="20" uuid="e8d12799-afee-4733-8d0a-b1e34a668390"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CATEGORY_OF_LOSS}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="256" width="395" height="20" uuid="921fa9b5-4808-4b58-91f8-a5ec1ef3f634"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CAT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="276" width="394" height="20" uuid="17f014cd-b80c-4ce8-8c3e-865089e602c4"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{GUILTY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="296" width="395" height="20" uuid="297d223e-b78c-4cb5-ad3a-e8cbd4a2cc4c"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLMH_PLACE_ACCIDENT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="318" width="394" height="18" uuid="66de6184-194f-4c38-a3cd-c4f6528ff3ec"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{NARRATION}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="19" y="347" width="181" height="25" uuid="7a7ece30-f7b9-4a27-9179-3e90d7f7d176">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<subreportParameter name="parClaimNumber">
+					<subreportParameterExpression><![CDATA[$P{parClaimNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["SUB1_FEATURE.jasper"]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="208" y="347" width="140" height="25" uuid="c4940c4e-4e60-4777-bcb6-42def0bd51a9"/>
+				<subreportParameter name="parClaimNumber">
+					<subreportParameterExpression><![CDATA[$P{parClaimNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["SUB2_EXPENSE.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="209" splitType="Prevent">
+			<staticText>
+				<reportElement x="19" y="167" width="68" height="14" uuid="04fa5318-0298-4dda-9a52-bd6fceb01f6a"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[Created By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="19" y="193" width="68" height="14" uuid="a6edd0dc-301e-417d-b9fb-e688853079a0"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[Approved By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="167" width="18" height="14" uuid="cc6c958d-dd7d-49ab-9766-9bb44bc9fdc7"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="193" width="18" height="14" uuid="dc9ecb2b-7821-4979-96df-653d9cd9a51d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="128" y="167" width="104" height="14" uuid="f07152f9-6931-4525-9c87-038646b2ae29"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREATED_BY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="128" y="193" width="104" height="14" uuid="b0e963e7-6961-4941-a513-1392c1ca4a30"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVED_BY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="322" y="167" width="68" height="14" uuid="82a0b23a-f736-469d-8d24-bb076e6e9a53"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[Created Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="322" y="193" width="68" height="14" uuid="8193b0aa-7f11-4e78-aa6b-28bcdc4b9667"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[Approved Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="408" y="167" width="18" height="14" uuid="f1baf975-d4c2-4cab-9625-34acb5d4c746"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="408" y="193" width="18" height="14" uuid="03fee2bd-66aa-4b69-b390-629d7dd4db5b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="431" y="167" width="104" height="14" uuid="e884b9f6-6d04-444a-b7fa-40894043a61c"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREATED_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="431" y="193" width="104" height="14" uuid="5e588a95-4bf2-490a-97a2-ebbca009094e"/>
+				<textElement textAlignment="Left">
+					<font fontName="Serif" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{APPROVED_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="0" width="140" height="20" uuid="184a3287-4928-49b6-aee0-eb8db5d011f6"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="20" y="21" width="534" height="50" uuid="410bc3fc-97ef-47a3-bcf3-9a183f1ce4c6"/>
+				<subreportParameter name="parClaimNumber">
+					<subreportParameterExpression><![CDATA[$P{parClaimNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["RI_MOTOR_BREAKDOWN.jasper"]]></subreportExpression>
+			</subreport>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="0" width="79" height="20" uuid="b86abb61-a3bd-4708-8603-8056a3cd79f9">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parTotalNetEstimat}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="239" y="0" width="80" height="20" uuid="d6147cb0-9010-4b72-bd28-dbab446e1370">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parTotalDeductible}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="442" y="0" width="107" height="20" uuid="e0e59cd3-d904-4d4a-8e7d-feeaaeaf3ad4">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{partTotalClaimDetail}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="319" y="0" width="123" height="20" uuid="d9bf35ae-3219-480d-b7fb-b5894471000b"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

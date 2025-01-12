@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2" language="groovy" pageWidth="1155" pageHeight="842" columnWidth="1115" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="26d287a2-c079-4a9f-8993-209b6876da2f">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="144"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter1.xml"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="parImagePath" class="java.lang.String"/>
+	<parameter name="parPrintedBy" class="java.lang.String"/>
+	<parameter name="parPrintedDateTime" class="java.lang.String"/>
+	<parameter name="parBranch_Code" class="java.lang.String"/>
+	<parameter name="parDateTo" class="java.lang.String"/>
+	<parameter name="parCurr_Code" class="java.lang.String"/>
+	<parameter name="parDateFrom" class="java.lang.String"/>
+	<parameter name="parAccountNo" class="java.lang.String"/>
+	<parameter name="parSQL" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[/* Formatted on 3/10/2019 2:45:41 PM (QP5 v5.215.12089.38647) */
+SELECT BRANCH_NAME,
+       BRANCH_ADDR3,
+       BRANCH_ADDR2,
+       BRANCH_ADDR1,
+       BR_TEL,
+       AC_NO,
+       FULL_NAME AC_DESC,
+       AC_BRANCH,
+       TRN_DT,
+       VALUE_DT,
+       TRN_CODE,
+       DEBIT,
+       CREDIT,
+       0 ACY_BAL,
+       BALANCE,
+       AC_CCY,
+       TRN_DESC,
+       USER_ID,
+       AUTH_ID,
+       ADDRESS_LINE4,
+       ADDRESS_LINE3,
+       ADDRESS_LINE2,
+       ADDRESS_LINE1,
+       MOBILE_NUMBER,(
+        SELECT AC_DESC FROM STTM_CUST_ACCOUNT A WHERE A.CUST_AC_NO=$P{parAccountNo} ) AC_NAME
+       ,(SELECT MOBILE_NUMBER FROM STTM_CUST_PERSONAL WHERE CUSTOMER_NO=(SELECT CUST_NO FROM STTM_CUST_ACCOUNT A WHERE A.CUST_AC_NO=$P{parAccountNo} ))CUST_PHONE
+FROM (select a.*,(SUM (a.acy_bal1) OVER (ORDER BY a.AC_ENTRY_SR_NO)) BALANCE from (
+        SELECT 0 rec,
+        min(BRANCH_NAME)BRANCH_NAME,
+        min(BRANCH_ADDR3)BRANCH_ADDR3,
+        min(BRANCH_ADDR2)BRANCH_ADDR2,
+        min(BRANCH_ADDR1)BRANCH_ADDR1,
+        '023 991 168' BR_TEL,
+        min(ADDRESS_LINE4)ADDRESS_LINE4,
+        min(ADDRESS_LINE3)ADDRESS_LINE3,
+        min(ADDRESS_LINE2)ADDRESS_LINE2,
+        min(ADDRESS_LINE1)ADDRESS_LINE1,
+        min(AC_NO)AC_NO,
+        min(FULL_NAME)FULL_NAME,
+        min(MOBILE_NUMBER)MOBILE_NUMBER,
+        min(AC_BRANCH)AC_BRANCH,
+        TO_DATE($P{parDateFrom} )    TRN_DT,
+        TO_DATE($P{parDateFrom} )    VALUE_DT,
+        ''       TRN_CODE,
+                 nvl(SUM(  DECODE (DRCR_IND, 'D', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))),0)
+                    DEBIT,
+                 nvl(SUM(  DECODE (DRCR_IND, 'C', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))),0)
+                    CREDIT,
+                 nvl( SUM(  DECODE (DRCR_IND, 'C', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0)))-
+                 SUM(  DECODE (DRCR_IND, 'D', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))),0) ACY_BAL1
+
+                 ,'D' DORC,min(AC_CCY)AC_CCY,
+                 'Opening Balance 'TRN_DESC,
+                 ''USER_ID,
+                 ''AUTH_ID,0 AC_ENTRY_SR_NO
+       FROM ACVW_ALL_AC_ENTRIES A
+       INNER JOIN (SELECT BRANCH_CODE,
+                                    BRANCH_NAME,
+                                    BRANCH_ADDR3,
+                                    BRANCH_ADDR2,
+                                    BRANCH_ADDR1,
+                                    '023 991 168' BR_TEL
+                               FROM STTM_BRANCH) B
+                    ON A.AC_BRANCH = B.BRANCH_CODE
+                 LEFT JOIN (SELECT CUSTOMER_NO,
+                                   FULL_NAME,
+                                   MOBILE_NUMBER,
+                                   ADDRESS_LINE4,
+                                   ADDRESS_LINE3,
+                                   ADDRESS_LINE2,
+                                   ADDRESS_LINE1
+                              FROM    (SELECT A.CUSTOMER_NO,
+                                              A.FULL_NAME,
+                                              B.MOBILE_NUMBER,
+                                              B.P_PINCODE
+                                         FROM    STTM_CUSTOMER A
+                                              INNER JOIN
+                                                 (SELECT CUSTOMER_NO,
+                                                         MOBILE_NUMBER,
+                                                         P_PINCODE
+                                                    FROM STTM_CUST_PERSONAL) B
+                                              ON A.CUSTOMER_NO = B.CUSTOMER_NO) C
+                                   INNER JOIN
+                                      STTM_ADDRESS D
+                                   ON C.P_PINCODE = D.ADDRESS_CODE) C
+                    ON A.RELATED_CUSTOMER = C.CUSTOMER_NO
+       WHERE A.AC_NO=$P{parAccountNo}
+AND A.TRN_DT <= case when to_date($P{parDateFrom})< (select min(TRN_DT) from acvw_all_ac_entries where ac_no=$P{parAccountNo}) then (select min(TRN_DT) from acvw_all_ac_entries where ac_no=$P{parAccountNo})  else to_date($P{parDateFrom}) end
+       union all
+
+       SELECT    AC_ENTRY_SR_NO rec,
+                 BRANCH_NAME,
+                 BRANCH_ADDR3,
+                 BRANCH_ADDR2,
+                 BRANCH_ADDR1,
+                 B.BR_TEL,
+                 ADDRESS_LINE4,
+                 ADDRESS_LINE3,
+                 ADDRESS_LINE2,
+                 ADDRESS_LINE1,
+                 AC_NO,
+                 C.FULL_NAME,
+                 MOBILE_NUMBER,
+                 AC_BRANCH,
+                 TRN_DT,
+                 VALUE_DT,
+                 TRN_CODE,
+                   DECODE (DRCR_IND, 'D', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))
+                    DEBIT,
+                   DECODE (DRCR_IND, 'C', 1, 0)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))
+                    CREDIT,
+                   DECODE (DRCR_IND, 'D', -1, 1)
+                 * DECODE (AC_CCY, 'USD', LCY_AMOUNT, NVL (FCY_AMOUNT, 0))
+                 ACY_BAL1 ,A.DRCR_IND,
+                 AC_CCY,
+                 (SELECT TRN_DESC
+                    FROM STTM_TRN_CODE
+                   WHERE A.TRN_CODE = TRN_CODE)
+                 TRN_DESC,
+                 USER_ID,
+                 AUTH_ID,a.AC_ENTRY_SR_NO
+            FROM ACVW_ALL_AC_ENTRIES A
+                 INNER JOIN (SELECT BRANCH_CODE,
+                                    BRANCH_NAME,
+                                    BRANCH_ADDR3,
+                                    BRANCH_ADDR2,
+                                    BRANCH_ADDR1,
+                                    '023 991 168' BR_TEL
+                               FROM STTM_BRANCH) B
+                    ON A.AC_BRANCH = B.BRANCH_CODE
+                 LEFT JOIN (SELECT CUSTOMER_NO,
+                                   FULL_NAME,
+                                   MOBILE_NUMBER,
+                                   ADDRESS_LINE4,
+                                   ADDRESS_LINE3,
+                                   ADDRESS_LINE2,
+                                   ADDRESS_LINE1
+                              FROM    (SELECT A.CUSTOMER_NO,
+                                              A.FULL_NAME,
+                                              B.MOBILE_NUMBER,
+                                              B.P_PINCODE
+                                         FROM    STTM_CUSTOMER A
+                                              INNER JOIN
+                                                 (SELECT CUSTOMER_NO,
+                                                         MOBILE_NUMBER,
+                                                         P_PINCODE
+                                                    FROM STTM_CUST_PERSONAL) B
+                                              ON A.CUSTOMER_NO = B.CUSTOMER_NO) C
+                                   INNER JOIN
+                                      STTM_ADDRESS D
+                                   ON C.P_PINCODE = D.ADDRESS_CODE) C
+                    ON A.RELATED_CUSTOMER = C.CUSTOMER_NO
+           WHERE AC_NO = $P{parAccountNo}
+                 AND TRN_DT >= $P{parDateFrom} AND TRN_DT<= TO_DATE($P{parDateTo})
+                 --AND A.RELATED_CUSTOMER IN
+                 --       (  SELECT CUSTOMER_NO
+                 --          FROM STTM_CUSTOMER
+                 --             WHERE CUSTOMER_CATEGORY <> 'STAFF'
+                 --        )
+
+        ORDER BY AC_ENTRY_SR_NO ) a order by A.REC)]]>
+	</queryString>
+	<field name="BRANCH_NAME" class="java.lang.String"/>
+	<field name="BRANCH_ADDR3" class="java.lang.String"/>
+	<field name="BRANCH_ADDR2" class="java.lang.String"/>
+	<field name="BRANCH_ADDR1" class="java.lang.String"/>
+	<field name="BR_TEL" class="java.lang.String"/>
+	<field name="AC_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="AC_NO"/>
+	</field>
+	<field name="AC_DESC" class="java.lang.String"/>
+	<field name="AC_BRANCH" class="java.lang.String"/>
+	<field name="TRN_DT" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.label" value="TRN_DT"/>
+	</field>
+	<field name="VALUE_DT" class="java.sql.Timestamp"/>
+	<field name="TRN_CODE" class="java.lang.String"/>
+	<field name="DEBIT" class="java.math.BigDecimal"/>
+	<field name="CREDIT" class="java.math.BigDecimal"/>
+	<field name="ACY_BAL" class="java.math.BigDecimal"/>
+	<field name="BALANCE" class="java.math.BigDecimal"/>
+	<field name="AC_CCY" class="java.lang.String"/>
+	<field name="TRN_DESC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="TRN_DESC"/>
+	</field>
+	<field name="USER_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="USER_ID"/>
+	</field>
+	<field name="AUTH_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="AUTH_ID"/>
+	</field>
+	<field name="ADDRESS_LINE4" class="java.lang.String"/>
+	<field name="ADDRESS_LINE3" class="java.lang.String"/>
+	<field name="ADDRESS_LINE2" class="java.lang.String"/>
+	<field name="ADDRESS_LINE1" class="java.lang.String"/>
+	<field name="MOBILE_NUMBER" class="java.lang.String"/>
+	<field name="AC_NAME" class="java.lang.String"/>
+	<field name="CUST_PHONE" class="java.lang.String"/>
+	<variable name="varDr" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT}]]></variableExpression>
+	</variable>
+	<variable name="varCr" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="129" splitType="Stretch">
+			<staticText>
+				<reportElement x="102" y="0" width="374" height="57" uuid="ea8ae823-af8b-4b33-8786-aeef7a11286e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prince Bank Plc]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="102" height="99" uuid="916c8c10-0450-4622-8b3d-dc8ba25077fe"/>
+				<imageExpression><![CDATA[$P{parImagePath}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="102" y="57" width="374" height="23" backcolor="#FFFFCC" uuid="9122f48f-2ea2-4457-b41f-0947cae465b1"/>
+				<textElement verticalAlignment="Top">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account Statement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="102" y="80" width="64" height="17" uuid="292ec0ea-f667-4897-a2e5-152b81a6de9d"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[From date  : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="64" width="90" height="17" uuid="18efde6f-cfea-4311-9214-e7ee4d8cb32a"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Printed by :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="82" width="90" height="17" uuid="9f7c8058-318b-48a7-878d-5efb751010da"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Printed date time :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="590" y="64" width="125" height="17" uuid="944eadf8-98b0-4cf2-8dba-3477d3cf0c90"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parPrintedBy}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="590" y="82" width="125" height="17" uuid="a0547a21-2023-408b-b604-4ea7ed202df7"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parPrintedDateTime}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="316" y="81" width="84" height="17" uuid="45724468-9c19-48b5-af8b-794ee8ec7895"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parDateTo}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="267" y="80" width="49" height="17" uuid="7fb39746-6c2a-4409-9540-116ecbc2ce26"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[To date  :]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="166" y="80" width="101" height="17" uuid="a90c3b0f-23f5-4e53-a426-2a06467c4c1a"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parDateFrom}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="115" width="742" height="1" uuid="5819584a-693a-4520-baee-be8f5336eb4f"/>
+			</line>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="120" splitType="Stretch">
+			<textField>
+				<reportElement x="102" y="20" width="308" height="20" uuid="813435e0-c002-4f59-9ae5-79d305a850c7"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BRANCH_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="0" width="107" height="20" uuid="2cc8286c-f92a-4718-9b6d-d4ba162ef087"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AC_BRANCH}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="109" y="80" width="577" height="20" uuid="874034b7-17a6-4f9e-a125-428ae5d19fae"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BRANCH_ADDR3}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="102" height="20" uuid="f112a509-bf47-40bd-b5e5-babd7798ad5d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Branch Code :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="102" height="20" uuid="1995e1d7-3adc-47a3-b62e-870882df0a80"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Branch Name :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="80" width="109" height="20" uuid="e6e8cd1e-e21f-471d-a2f9-d11544446a2c"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Branch Address :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="102" y="40" width="107" height="20" uuid="05cc064e-b6f1-48a4-ba41-31724eba124a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BR_TEL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="40" width="102" height="20" uuid="cfc1e446-aa8a-409c-989a-6f29552b7e07"/>
+				<textElement verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Branch Phone :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="529" y="0" width="157" height="20" uuid="da993dc7-d151-466d-94f5-4b47e76e112d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AC_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="429" y="0" width="100" height="20" uuid="ecf247ae-5e14-4ca2-921c-5f12e678458d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Customer Name :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="429" y="20" width="100" height="20" uuid="42b17a57-f2c8-40b5-9b31-f2dee1c2b1e5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Account No : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="429" y="60" width="100" height="20" uuid="30f4ac51-5385-4d29-a640-9046ca7bee54"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Phone :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="529" y="20" width="157" height="20" uuid="faef7ab6-0591-4f61-ac37-5f6c6cc73313"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AC_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="529" y="60" width="157" height="20" uuid="626b87aa-a09f-4e8c-a471-60519e595072"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUST_PHONE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="429" y="40" width="100" height="20" uuid="19a40ac1-6919-4346-a942-86de332d123e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Currency :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="529" y="40" width="157" height="20" uuid="23d7cc26-5193-42a1-a158-7457fa851da7"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AC_CCY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="100" width="109" height="20" uuid="fcd91698-e77d-4390-be94-0b4003805fcf"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Customer Address :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="109" y="100" width="91" height="20" uuid="dceaeb02-d6e1-40bd-9446-457eb8d604e4"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE4}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="100" width="100" height="20" uuid="8ff75869-6953-4da0-9ad5-b74117d78b79"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="300" y="100" width="100" height="20" uuid="acca1c29-0ffc-46b6-8b4a-2aea72e111a8"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="100" width="286" height="20" uuid="1550a9ea-5e9d-4593-888f-88f99470a3b8"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS_LINE1}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="102" height="20" backcolor="#CCFFFF" uuid="f1369ce3-a905-4e34-853c-92708875233d"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Transaction Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="187" y="0" width="255" height="20" backcolor="#CCFFFF" uuid="2030cdf3-2da7-4596-87d1-d7c8043108e3"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[   Transaction Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="102" y="0" width="85" height="20" backcolor="#CCFFFF" uuid="2b07b0de-03b5-42ec-aa37-02b3e8a402a0"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Transaction Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="442" y="0" width="100" height="20" backcolor="#CCFFFF" uuid="561b67c6-5881-48af-b7b2-6802286bc5b4"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dr Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="542" y="0" width="100" height="20" backcolor="#CCFFFF" uuid="e04aa88c-bcea-4561-b673-13b7e5dceab5"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cr Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="642" y="0" width="100" height="20" backcolor="#CCFFFF" uuid="a4d64338-1957-4a7c-8dfe-ec47b4f2f7f9"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Balance]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="0" y="0" width="102" height="20" uuid="9ee94f63-b3e9-4838-a99a-ddc88f09d1bf"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TRN_DT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="187" y="0" width="255" height="20" uuid="54d9baca-74e7-4d83-84e2-86e5c6708174"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["   "+$F{TRN_DESC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="102" y="0" width="85" height="20" uuid="f5181ec6-efa4-4acc-b17f-cd45a72a1caa"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TRN_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="442" y="0" width="100" height="20" uuid="2752bdf9-024d-4465-85ab-517d95bc0cd1"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DEBIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="542" y="0" width="100" height="20" uuid="d3751483-7ee9-4fbf-9902-57e0d22bc77d"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CREDIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="642" y="0" width="100" height="20" uuid="b2924ca9-9805-4321-9e0c-789c9957a9ce"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALANCE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="5" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="3" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="135" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="642" y="0" width="100" height="20" backcolor="#CCCCCC" uuid="b497cd14-a994-45a7-90d3-ca7a5060d168"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="442" y="0" width="100" height="20" backcolor="#CCCCCC" uuid="11e35ef3-da7d-4c99-a53d-71fd7465dc7a"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{varDr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="542" y="0" width="100" height="20" backcolor="#CCCCCC" uuid="e55b80ab-6f6e-4607-8917-d53d05f5a63f"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{varCr}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="442" height="20" backcolor="#CCCCCC" uuid="5c2bc556-0382-44cb-aaf9-603b27267f9a"/>
+				<box>
+					<pen lineWidth="0.25" lineStyle="Dotted"/>
+					<topPen lineWidth="0.25" lineStyle="Dotted"/>
+					<leftPen lineWidth="0.25" lineStyle="Dotted"/>
+					<bottomPen lineWidth="0.25" lineStyle="Dotted"/>
+					<rightPen lineWidth="0.25" lineStyle="Dotted"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total   ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="67" width="742" height="68" uuid="738adbe4-8964-43e0-a571-ae4df7737c9e"/>
+				<text><![CDATA[Address 175CD, Mao Tse Tong Blud, Toul Svay Prey 1, Chamkar Mon, Phnom Penh, Cambodia
+Tel: 023 991 168 (1800 20 8888 (ឥតគិតថ្លៃ))
+E-mail: info@princeplc.om.kh
+Website: www.princeplc.com.kh	]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

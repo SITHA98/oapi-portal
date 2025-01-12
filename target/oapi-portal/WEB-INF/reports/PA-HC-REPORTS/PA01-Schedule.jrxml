@@ -1,0 +1,769 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-04-07T15:00:14 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PA01-Endorsement-AttachedList" pageWidth="595" pageHeight="992" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="19" bottomMargin="20" whenResourceMissingType="Error" isIgnorePagination="true" uuid="e3175119-0bc5-407b-aca1-dd5c39ea5d74">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<property name="com.jaspersoft.studio.unit." value="cm"/>
+	<parameter name="parTotalBenA" class="java.lang.Number"/>
+	<parameter name="parTotalBenB" class="java.lang.Number"/>
+	<parameter name="parTotalBenC" class="java.lang.Number"/>
+	<parameter name="parTotalRecord" class="java.lang.Number"/>
+	<parameter name="parCondictionAndClauses" class="java.lang.String"/>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parPolh_sys_id" class="java.lang.String"/>
+	<parameter name="parHospital_loc" class="java.lang.String"/>
+	<parameter name="parLHIAddress" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[WITH ALIST AS (
+SELECT 
+P.POLH_SYS_ID,
+P.POLH_SRNUM,
+P.POLH_POLNUM,
+--P.POLH_DISPLAY_POLNUM,
+FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,P.POLH_EXTNUM) AS POLH_DISPLAY_POLNUM, 
+(SELECT B.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN(P.POLH_DEBIT_PARTY)) AS INT_NAME,
+--(SELECT B.CVBR_BRANCH_NAME FROM IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN('BA000008')) AS INT_NAME,
+P.POLH_DEBIT_PARTY AS INT_CODE,
+UPPER(P.POLH_ASSRDNM) AS INSURED_NAME,
+P.POLH_CLIENT AS INSURED_CODE,
+--P.POLH_SALESMAN AS POLH_SALESMAN,
+--(SELECT E.EMP_FIRST_NAME ||' '|| E.EMP_LAST_NAME FROM CVT_EMP E WHERE E.EMP_ID = P.POLH_SALESMAN) AS AGENCY_NAME,
+P.POLH_DEBIT_PARTY,CASE WHEN P.POLH_COB='PA00' THEN 'Schedule - Personal Accident Group' ELSE 'Schedule - Personal Accident (Personal Lines)' END AS REPORT_TITLE,
+replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' ') AS ADDRESS,
+(SELECT B.CVBR_VAT_NO FROM RAIMS.IBM_PARTY_BRANCH B WHERE B.CVBR_BRANCH_CODE=P.POLH_CLIENT) AS BUSINESS_REG_NO,
+--'?' AS BUSINESS_OCCUPATION,
+P.POLH_INDUSTRY AS BUSINESS_OCCUPATION_CODE,
+(SELECT IND_DESC FROM RAIMS.INM_MST_IND WHERE IND_CODE=P.POLH_INDUSTRY) AS BUSINESS_OCCUPATION,
+--P.POLH_DAYS AS PERIOD_OF_INSURANCE,
+TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY')EFFECTIVE_DATE,
+TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE,
+G2.PINT_GEO AS GEO_LIMIT,
+case when G2.PINT_GEO='01' THEN 'Standard-24 Hr Worldwide' else 'Working Hr within Cambodia' end AS TERRITORIAL_LIMIT,
+--O2.PBLK_LOC_DESC||O2.PBLK_LOC_ADD AS LOCATION,
+--O2.PBLK_TARIFF_DESC AS OCC_CONTRUCTION_TYPE,
+--(SELECT OBJ_DESC FROM INM_MST_OBJ WHERE OBJ_CODE=O3.PINT_OBJECT) AS OCC_CONTRUCTION_TYPE,
+--I.PINT_DESC AS ITEM_INTEREST_DETAIL,
+--'?' AS COVER_DESCRIPTION,
+ROUND(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC,2) AS PREMIUM,
+P.POLH_ADJ_PREM_BC AS ADJUST_PREMIUM,
+P.POLH_FEES3_BC AS ADMIN_FEE,
+(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC + P.POLH_FEES3_BC) AS TOTAL,
+G2.PINT_INSURED,
+G2.PINT_SEX,TO_CHAR(G2.PINT_DOB,'DD-MON-YYYY') PINT_DOB,G2.PINT_AGE,G2.PINT_MASS_NAME,G2.PINT_SI_BC,(G2.PINT_PREM_BC+P.POLH_ADJ_PREM_BC+P.POLH_FEES3_BC)PINT_PREM_BC,G2.PINT_SYS_ID
+,FN_GET_NOF_PERSON_ATTACHED_LIST(P.POLH_SYS_ID) AS NOF_PERSONS
+--G3.PCOV_COVER,G3.PCOV_SI_BC
+--G3.*
+--(SELECT SUM(T.PCOV_SI_BC) FROM INT_UW_PCOV T WHERE T.PCOV_PINTMED_SYS_ID='3666' GROUP BY T.PCOV_COVER)SUMBENA 
+FROM RAIMS.INT_UW_POLH P
+INNER JOIN RAIMS.INT_UW_PINT_MED G2 ON P.POLH_SYS_ID=G2.PINT_POLH_SYS_ID
+--INNER JOIN INT_UW_PCOV G3 ON G3.PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID AND G3.PCOV_SYS_ID=(SELECT MAX(PCOV_SYS_ID) FROM INT_UW_PCOV WHERE PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID)
+--INNER JOIN (SELECT 
+--SUM(CASE WHEN G3.PCOV_COVER='BENA' THEN G3.PCOV_SI_BC ELSE 0 END) BENA,
+--SUM(CASE WHEN G3.PCOV_COVER='BENB' THEN G3.PCOV_SI_BC ELSE 0 END) BENB,
+--SUM(CASE WHEN G3.PCOV_COVER='BENC' THEN G3.PCOV_SI_BC ELSE 0 END) BENC,  
+--MAX(G3.PCOV_SYS_ID) AS PCOV_SYS_ID, G3.PCOV_PINTMED_SYS_ID 
+--FROM INT_UW_PCOV G3 
+--WHERE G3.PCOV_PINTMED_SYS_ID='3666'
+--WHERE G3.PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID  
+--GROUP BY G3.PCOV_PINTMED_SYS_ID) G3 ON G3.PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID
+WHERE P.POLH_POLNUM = $P{parPolicyNumber}
+--WHERE P.POLH_POLNUM = 'P01PA01200007/000/00'
+)SELECT A.* FROM ALIST A WHERE A.PINT_SYS_ID=(SELECT MAX(PINT_SYS_ID) FROM ALIST)]]>
+	</queryString>
+	<field name="POLH_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SYS_ID"/>
+	</field>
+	<field name="POLH_SRNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SRNUM"/>
+	</field>
+	<field name="POLH_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_POLNUM"/>
+	</field>
+	<field name="POLH_DISPLAY_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_DISPLAY_POLNUM"/>
+	</field>
+	<field name="INT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_NAME"/>
+	</field>
+	<field name="INT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_CODE"/>
+	</field>
+	<field name="INSURED_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_NAME"/>
+	</field>
+	<field name="INSURED_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_CODE"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="BUSINESS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_REG_NO"/>
+	</field>
+	<field name="BUSINESS_OCCUPATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_OCCUPATION"/>
+	</field>
+	<field name="EFFECTIVE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EFFECTIVE_DATE"/>
+	</field>
+	<field name="EXPIRY_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+	</field>
+	<field name="PINT_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PINT_SYS_ID"/>
+	</field>
+	<field name="PREMIUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PREMIUM"/>
+	</field>
+	<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+	<field name="BUSINESS_OCCUPATION_CODE" class="java.lang.String"/>
+	<field name="GEO_LIMIT" class="java.lang.String"/>
+	<field name="TERRITORIAL_LIMIT" class="java.lang.String"/>
+	<field name="ADMIN_FEE" class="java.math.BigDecimal"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="PINT_INSURED" class="java.lang.String"/>
+	<field name="PINT_SEX" class="java.lang.String"/>
+	<field name="PINT_DOB" class="java.lang.String"/>
+	<field name="PINT_AGE" class="java.math.BigDecimal"/>
+	<field name="PINT_MASS_NAME" class="java.lang.String"/>
+	<field name="PINT_SI_BC" class="java.math.BigDecimal"/>
+	<field name="PINT_PREM_BC" class="java.math.BigDecimal"/>
+	<field name="REPORT_TITLE" class="java.lang.String"/>
+	<field name="ADJUST_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="NOF_PERSONS" class="java.lang.String"/>
+	<group name="myGroup">
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="112" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<rectangle>
+				<reportElement x="0" y="68" width="554" height="38" uuid="5d8ee770-190e-4807-b066-6c19837a762f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="3" y="71" width="548" height="31" backcolor="#BABABA" uuid="643e0e8c-3352-4983-8d4f-8d9155924df1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="3" y="73" width="548" height="27" uuid="20c84a3a-3c31-4e28-8945-771e3d70641c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="840">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.spreadsheet.SpreadsheetLayout"/>
+			<rectangle>
+				<reportElement x="8" y="207" width="205" height="17" backcolor="#BABABA" uuid="2992bae1-8760-4847-a85b-2fbb9f7285eb"/>
+				<graphicElement>
+					<pen lineColor="#BABABA"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="8" y="326" width="205" height="17" backcolor="#BABABA" uuid="fa0896a8-6e01-43c7-a01c-852b4e08e9f2"/>
+				<graphicElement>
+					<pen lineColor="#BABABA"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement x="7" y="325" width="548" height="1" uuid="18a1f15f-1a58-488f-9a1a-387b78325c2f"/>
+			</line>
+			<staticText>
+				<reportElement x="9" y="328" width="170" height="16" backcolor="#000000" uuid="4cc67fe7-f75b-4430-8d2d-d0ab9f0df760"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SPECIAL CONDITIONS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="651" width="139" height="29" uuid="827c29f6-7e30-462a-afd6-c9295be55936"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[For and on behalf of
+LY HOUR INSURANCE PLC]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="10" y="683" width="169" height="15" uuid="16dd47fa-5a17-4bc2-b782-b9aa250d685b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Date          : "+new java.text.SimpleDateFormat("d-MMM-YYYY").format(new Date())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="381" y="717" width="136" height="16" uuid="72277342-0b82-4a9b-8f3c-1356f7c3060c"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Authorized Signatory]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="128" width="100" height="14" uuid="5ea7f073-0509-4c08-bcf9-92b27ebc0509"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Compensation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="3" width="100" height="15" uuid="204acea4-0709-4a36-8503-46f149254f70">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Policy No.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="33" width="238" height="15" uuid="1dec0286-7056-4d4d-8624-01a1c858583b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="8" y="261" width="205" height="17" backcolor="#BABABA" uuid="e2184265-0715-432d-8d79-836fbc36933f"/>
+				<graphicElement>
+					<pen lineColor="#BABABA"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="474" y="226" width="79" height="14" uuid="2aba3575-1e2f-4e57-9605-ca01345921a7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL BENC]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="100" width="238" height="14" uuid="2e8960c1-61e7-4d50-ab38-8ff10e5826c8"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FROM "+$F{EFFECTIVE_DATE}+" TO " + $F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="86" width="100" height="14" uuid="3a38df44-68a0-484d-93c6-c37eb91ee986"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bussiness Occupation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="208" width="170" height="16" backcolor="#000000" uuid="94025d6f-471d-4fe8-8285-ef762c8298e5"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[SCHEDULES OF BENEFITS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="33" width="10" height="15" uuid="c21a6d13-86e5-4d86-a6a8-65886f2c2aae">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="48" width="100" height="38" uuid="7934fe3e-2414-4560-a6e1-e3ee2e9f719a"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="3" width="10" height="15" uuid="be1ca85f-2d27-4ddd-bc54-c9350156c0fc">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="7" y="260" width="548" height="1" uuid="306adace-b8ff-4066-ba0a-d11ebd12504c"/>
+			</line>
+			<staticText>
+				<reportElement x="460" y="33" width="10" height="15" uuid="fb5c78fd-2729-4034-8f2b-7fcddc4f4a3a">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="3" width="10" height="15" uuid="dcb4db28-5ef4-47ed-b68a-de63bc997c16">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="470" y="18" width="84" height="15" uuid="d944939b-2595-4995-b72b-37b132c55901">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INSURED_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="370" y="18" width="90" height="15" uuid="089d64ad-b579-46a6-a2e7-972d9a5a487b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d635c9fb-0b11-42c4-b625-54d0531d277f"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="33" width="100" height="15" uuid="ac336ac0-3ea4-447a-8ea4-883f2aef61f7">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name of Insured]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="9" y="262" width="170" height="16" backcolor="#000000" uuid="71f4b54b-e107-474a-bfc2-3236e67f21bb"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[THE PREMIUM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="128" width="238" height="78" uuid="1847654d-7ad1-4ff4-82f5-04c4ec6efaf8"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Bodily injury caused by violent accidental and visible means and solely and independently of any other cause resulting in:-
+Benefit A - Accidental Death
+Accidental Medical Indemnity
+Permanent Total/ Partial Disablement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="18" width="100" height="15" uuid="6f73d02b-6c58-40dd-9f9d-600471d05a92">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agency Name]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="281" y="279" width="100" height="14" uuid="158cd083-aeda-475f-85d3-4439388acb0e"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PREMIUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="3" width="238" height="15" uuid="470d1d0e-f0f3-4704-8bfe-7f39d0febd04">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POLH_DISPLAY_POLNUM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="100" width="100" height="14" uuid="209fc1b1-8438-4dcb-b26f-8cfe1edbf938"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Period of Insurance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="100" width="10" height="14" uuid="cb08d2b7-3043-4bbd-8d0a-8c52a1e94085"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="474" y="240" width="79" height="16" uuid="884d11b1-0bf1-40bd-bbe5-47d77d1914ae">
+					<property name="local_mesure_unitwidth" value="cm"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parTotalBenC}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="120" y="279" width="110" height="14" backcolor="#000000" uuid="7c91949a-5ce7-4d3e-82d0-17bea535e47b"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[GROSS PREMIUM]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="395" y="240" width="79" height="16" uuid="27e1e941-5729-488e-b062-774d58342c85">
+					<property name="com.jaspersoft.studio.unit.width" value="cm"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parTotalBenB}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="315" y="226" width="80" height="14" uuid="725e6e3d-a9c4-4046-b5bf-4d26d2c3ef99"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL BENA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="86" width="10" height="14" uuid="1a24d10f-92d2-4874-b4b9-a0414e57e8aa"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="307" width="110" height="14" backcolor="#000000" uuid="f01dd06a-afe1-4cc0-ae8f-32e1bb5eef22"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="293" width="110" height="14" backcolor="#000000" uuid="7b571256-e1df-402d-bd49-2af84cac20f0"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[ADMIN FEE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="3" width="90" height="15" uuid="5a258e41-09cc-40d3-aca2-d76d23e9abc2">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="79bc484c-a2ca-4de5-a382-36ca55d3e3d3"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agency Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="18" width="10" height="15" uuid="b84446d2-56de-4424-984c-650e219b14bb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="114" width="100" height="14" uuid="232a86c2-d239-4a20-b7b8-b40f29466ad0"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Territorial Limit]]></text>
+			</staticText>
+			<line>
+				<reportElement x="7" y="206" width="548" height="1" uuid="6960768c-14e9-4234-8754-fe2b2cf416a7"/>
+			</line>
+			<staticText>
+				<reportElement x="230" y="293" width="30" height="14" backcolor="#000000" uuid="4d99faaa-6d95-4965-8328-71cb0ad2fc0a"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="128" width="10" height="14" uuid="28faeae5-ae42-4369-949f-b039c1bda47e"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="281" y="307" width="100" height="14" uuid="9bc37545-9bf7-409b-8566-575eb2765915"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="48" width="238" height="38" uuid="b9b30c67-6918-453b-a02c-0288022349e7"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="114" width="238" height="14" uuid="6c05b786-6beb-4a26-bd02-a2cdbc416ca7"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TERRITORIAL_LIMIT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="230" y="279" width="30" height="14" backcolor="#000000" uuid="6df8873c-b6c7-42e7-841c-ee47ed266d02"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="226" width="79" height="14" uuid="6ad319fc-1c82-49de-80d4-50ebdc1105dc">
+					<property name="local_mesure_unitwidth" value="cm"/>
+					<property name="com.jaspersoft.studio.unit.width" value="cm"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL BENB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="226" width="305" height="14" uuid="72a7ed82-b993-40c5-b4d9-ac745a7c6673"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="114" width="10" height="14" uuid="7b793212-8e4f-4e62-8bd1-255a936cea33"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="307" width="30" height="14" backcolor="#000000" uuid="2595584f-0018-40d1-9fca-df32abcdf362"/>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="86" width="238" height="14" uuid="d5bf63d4-975e-4cfd-bcf0-de6641ea0ef2"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BUSINESS_OCCUPATION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="110" y="48" width="10" height="38" uuid="58df9e44-c623-4531-8d16-8845cbd12836"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="281" y="293" width="100" height="14" uuid="fa4884d0-3d6d-465f-bc1d-336115f61799"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADMIN_FEE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="315" y="240" width="80" height="16" uuid="2797b2e5-fddc-43ba-98b3-b2a77f2d22b7"/>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parTotalBenA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="370" y="33" width="90" height="15" uuid="9eee293f-8d8c-4337-ab70-1ffd82d29047">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Business Reg No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="18" width="10" height="15" uuid="8a37a2de-3a7a-4331-b777-82bc54c5896d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="470" y="3" width="84" height="15" uuid="8a58ef01-0260-4c8b-9b86-6ace87da7274">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POLH_DEBIT_PARTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="18" width="238" height="15" uuid="797edd8b-9365-4e6b-bda3-04b59a68ef70">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="240" width="305" height="16" uuid="03b8a1c2-22d1-48e6-b76d-2678dd536704"/>
+				<box leftPadding="5">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PINT_INSURED}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="10" y="344" width="543" height="316" uuid="c4fca42a-f558-4619-bddb-cb96476c230d"/>
+				<subreportParameter name="parPolicyNumber">
+					<subreportParameterExpression><![CDATA[$P{parPolicyNumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="parCondictionAndClauses">
+					<subreportParameterExpression><![CDATA[$P{parCondictionAndClauses}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="parPolh_sys_id">
+					<subreportParameterExpression><![CDATA[$P{parPolh_sys_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["Cond_Clause_OnSchedule.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="470" y="33" width="84" height="15" uuid="115bdb88-0542-4ca8-bc5a-e45d43b86e16">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{BUSINESS_REG_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="10" y="699" width="139" height="15" uuid="40f4e556-6269-4c76-8a09-c857b54b5a23">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Printed at : Phnom Penh"]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center">
+				<reportElement isPrintRepeatedValues="false" mode="Opaque" x="30" y="736" width="70" height="70" uuid="34a94027-2c7b-4884-84f9-7caf06b5a40e">
+					<property name="local_mesure_unitheight" value="cm"/>
+					<property name="local_mesure_unitwidth" value="cm"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parHospital_loc}]]></imageExpression>
+			</image>
+			<image hAlign="Center" vAlign="Bottom" isUsingCache="false">
+				<reportElement mode="Opaque" x="415" y="736" width="70" height="70" uuid="db48e4e7-39f9-4f54-be7c-30d8b482b4db">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="local_mesure_unitheight" value="cm"/>
+					<property name="com.jaspersoft.studio.unit.width" value="cm"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parLHIAddress}]]></imageExpression>
+			</image>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="0" y="808" width="130" height="15" uuid="e71a0430-189f-4184-97df-25bd370dd9aa">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Hospital & Clinic"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="380" y="807" width="136" height="16" uuid="87e4aa1b-e3a6-4cf8-90eb-c2fd98100073">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Google Map"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Prevent"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout"/>
+		</band>
+	</summary>
+</jasperReport>

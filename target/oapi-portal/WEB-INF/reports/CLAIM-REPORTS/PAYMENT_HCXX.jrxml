@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-03-31T15:48:59 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PAYMENT_HCXX" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9db8e6c1-4483-4f1f-bf36-76a45e31c0fd">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<parameter name="parPAYMENT_NUMBER" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+P1.PAPPRH_INTMTNH_CLMNUM 
+,P1.PAPPRH_INTMTNH_POLNUM 
+,P2.CLMH_EXTNUM
+,FN_GET_POLICY_FORMAT_CLAIM(P1.PAPPRH_INTMTNH_POLNUM) AS POLICY_NUMBER
+,FN_GET_PRODUCT_DESC(P1.PAPPRH_COB) AS PRODUCT_DESC
+,P1.PAPPRH_NUMBER 
+,P1.PAPPRH_TOT_APPR_FC 	
+,P1.PAPPRH_EXCHDT
+,TO_CHAR(PAPPRH_APPR_DATE,'DD-MON-YYYY') AS PAPPRH_APPR_DATE 
+,P1.PAPPRH_NAME
+,P1.PAPPRH_MODE_SETTLEMENT
+,P1.PAPPRH_ADDR1 
+,P1.PAPPRH_ADDR2 			
+,P1.PAPPRH_ADDR3 			
+,P1.PAPPRH_FTR_NAME	
+,P1.PAPPRH_FTR_CODE
+,P1.PAPPRH_REM		
+,P1.PAPPRH_PAY_TYPE
+,P1.PAPPRH_TOT_EST_FC
+,P1.PAPPRH_ADJ_FEE_FC
+,P1.PAPPRH_TOT_APPR_FC
+,P1.PAPPRH_TOT_DED_FC
+,P1.PAPPRH_PAY_TO
+,TO_CHAR(P2.CLMH_LOSS_DATE,'DD-MON-YYYY')AS CLMH_LOSS_DATE
+,TO_CHAR(P2.CLMH_TXN_DATE,'DD-MON-YYYY') AS CLMH_TXN_DATE
+,P2.CLMH_COL
+,P2.CLMH_REM
+,P2.CLMH_PLACE_ACCIDENT
+,P2.CLMH_NATURE
+,P2.CLMH_LNKNUM
+,P3.POLH_ASSRDNM
+,TO_CHAR(P3.POLH_STPERIOD,'DD-MON-YYYY') AS POLH_STPERIOD
+,TO_CHAR(P3.POLH_ENDPERIOD,'DD-MON-YYYY') AS POLH_ENDPERIOD
+,P3.POLH_ACCPT_TYPE
+,(SELECT ACC_DESC FROM RAIMS.INM_MST_ACCEPTANCE WHERE ACC_CODE=P3.POLH_ACCPT_TYPE AND ACC_ACTIVE='Y') AS AGENT_BROKER
+,P5.PINT_INSURED
+,P5.PINT_EMP_ID
+,P6.NOL_DESC
+--,P4.*
+,P4.CLAPR_TTY_TYPE
+,FN_GET_RE_INSURANCE_TYPE(P4.CLAPR_TTY_TYPE) AS RE_TYPE_NAME
+,P4.CLAPR_TTY_SHARE
+,P4.CLAPR_PAY_AMT_BC
+,(SELECT IH.IH_JRNL_TYPE||IH.IH_DOC_NO FROM RAIMS.GLT_INTERFACE_HEAD IH WHERE IH.IH_JRNL_TYPE IN('CNC') AND IH.IH_REF_NO3=P1.PAPPRH_NUMBER ) AS DOC_NO
+FROM RAIMS.INT_CL_PAY_APPR_HEAD P1
+INNER JOIN RAIMS.INT_CLM_HEAD P2 ON P2.CLMH_SYS_ID=P1.PAPPRH_INTMTNH_SYS_ID 
+INNER JOIN RAIMS.INT_UW_LPOLH P3 ON P3.POLH_SYS_ID=P1.PAPPRH_POLH_SYS_ID AND P3.POLH_EXTNUM=(SELECT MAX(P.POLH_EXTNUM) FROM RAIMS.INT_UW_LPOLH P WHERE P.POLH_SYS_ID=P1.PAPPRH_POLH_SYS_ID) 
+--INNER JOIN RAIMS.INT_RI_CLM_PAY_APPOR P4 ON P4.CLAPR_CLM_SYS_ID=P1.PAPPRH_INTMTNH_SYS_ID
+INNER JOIN RAIMS.INT_RI_CLM_PAY_APPOR P4 ON P4.CLAPR_PAPPRH_SYS_ID=P1.PAPPRH_SYS_ID
+INNER JOIN RAIMS.INT_UW_PINT_MED P5 ON  P5.PINT_SYS_ID = P1.PAPPRH_INT_SYS_ID AND P5.PINT_INSURED IS NOT NULL AND P5.PINT_REC_STATUS !='D'
+INNER JOIN RAIMS.INM_MST_NOL P6 ON P6.NOL_CODE=P2.CLMH_NOL_CODE
+INNER JOIN RAIMS.INM_MST_CLASS P7 ON P7.CLS_CODE=P1.PAPPRH_COB
+WHERE 
+--P1.PAPPRH_INTMTNH_CLMNUM='C01HC00210429';
+P4.CLAPR_TTY_SHARE>0 AND
+--P1.PAPPRH_INTMTNH_CLMNUM='C01HC00210417';
+--P1.PAPPRH_NUMBER='A01HC002100234'
+P1.PAPPRH_NUMBER=$P{parPAYMENT_NUMBER}]]>
+	</queryString>
+	<field name="PAPPRH_INTMTNH_CLMNUM" class="java.lang.String"/>
+	<field name="PAPPRH_INTMTNH_POLNUM" class="java.lang.String"/>
+	<field name="PAPPRH_NUMBER" class="java.lang.String"/>
+	<field name="PAPPRH_TOT_APPR_FC" class="java.math.BigDecimal"/>
+	<field name="PAPPRH_EXCHDT" class="java.sql.Timestamp"/>
+	<field name="PAPPRH_NAME" class="java.lang.String"/>
+	<field name="PAPPRH_ADDR1" class="java.lang.String"/>
+	<field name="PAPPRH_ADDR2" class="java.lang.String"/>
+	<field name="PAPPRH_ADDR3" class="java.lang.String"/>
+	<field name="PAPPRH_FTR_NAME" class="java.lang.String"/>
+	<field name="PAPPRH_FTR_CODE" class="java.lang.String"/>
+	<field name="PAPPRH_REM" class="java.lang.String"/>
+	<field name="PAPPRH_PAY_TYPE" class="java.lang.String"/>
+	<field name="PAPPRH_TOT_EST_FC" class="java.math.BigDecimal"/>
+	<field name="PAPPRH_ADJ_FEE_FC" class="java.math.BigDecimal"/>
+	<field name="PAPPRH_TOT_DED_FC" class="java.math.BigDecimal"/>
+	<field name="PAPPRH_PAY_TO" class="java.lang.String"/>
+	<field name="CLMH_LOSS_DATE" class="java.lang.String"/>
+	<field name="CLMH_TXN_DATE" class="java.lang.String"/>
+	<field name="CLMH_COL" class="java.lang.String"/>
+	<field name="CLMH_REM" class="java.lang.String"/>
+	<field name="CLMH_PLACE_ACCIDENT" class="java.lang.String"/>
+	<field name="CLMH_NATURE" class="java.lang.String"/>
+	<field name="CLMH_LNKNUM" class="java.lang.String"/>
+	<field name="POLH_ASSRDNM" class="java.lang.String"/>
+	<field name="POLH_STPERIOD" class="java.lang.String"/>
+	<field name="POLH_ENDPERIOD" class="java.lang.String"/>
+	<field name="POLH_ACCPT_TYPE" class="java.lang.String"/>
+	<field name="PINT_INSURED" class="java.lang.String"/>
+	<field name="PINT_EMP_ID" class="java.lang.String"/>
+	<field name="NOL_DESC" class="java.lang.String"/>
+	<field name="CLMH_EXTNUM" class="java.math.BigDecimal"/>
+	<field name="POLICY_NUMBER" class="java.lang.String"/>
+	<field name="CLAPR_TTY_TYPE" class="java.lang.String"/>
+	<field name="RE_TYPE_NAME" class="java.lang.String"/>
+	<field name="CLAPR_TTY_SHARE" class="java.math.BigDecimal"/>
+	<field name="CLAPR_PAY_AMT_BC" class="java.math.BigDecimal"/>
+	<field name="PRODUCT_DESC" class="java.lang.String"/>
+	<field name="PAPPRH_APPR_DATE" class="java.lang.String"/>
+	<field name="PAPPRH_MODE_SETTLEMENT" class="java.lang.String"/>
+	<field name="COLUMN_21" class="java.math.BigDecimal"/>
+	<field name="AGENT_BROKER" class="java.lang.String"/>
+	<field name="DOC_NO" class="java.lang.String"/>
+	<variable name="TotalShare" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLAPR_TTY_SHARE}]]></variableExpression>
+	</variable>
+	<variable name="varTotalAmtShare" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLAPR_PAY_AMT_BC}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="548" splitType="Stretch">
+			<rectangle>
+				<reportElement x="10" y="428" width="543" height="30" uuid="0efc25a5-40f7-4d8b-973b-17bde437c505"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="1" width="555" height="30" uuid="dd3df02f-d731-4afb-8c5d-03f3cbded49b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Claim Payment]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="35" width="355" height="17" uuid="24365b45-83bc-49ba-a4e4-853ad15d59b7">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_INTMTNH_CLMNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="52" width="355" height="17" uuid="2f32f855-7640-4a2c-9b53-deb817616f6c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{POLH_ASSRDNM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="69" width="354" height="17" uuid="e8aa200b-c550-4121-8006-8a04cbccc6c7">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{POLICY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="86" width="354" height="17" uuid="dd5337ab-4253-4a6d-8062-88ff9128d03a">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{AGENT_BROKER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="103" width="354" height="17" uuid="c60ad248-c5ab-4db3-a587-1940ad0ab9a3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+"FROM "+ $F{POLH_STPERIOD} +" TO "+$F{POLH_ENDPERIOD}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="120" width="355" height="17" uuid="a92ccf23-6bda-48d8-9065-1fad67827ac0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PRODUCT_DESC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="154" width="354" height="17" uuid="915bea0b-e36e-4f17-8606-c74cc0da46b3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_APPR_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="35" width="100" height="17" uuid="12163524-d19c-4ae5-86b9-cc2b41e2ba14">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Claim Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="52" width="100" height="17" uuid="8820800a-12d7-44f0-bffc-d662feac438b">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Insured Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="69" width="100" height="17" uuid="136674a8-f720-402a-94f2-ada372210bfb">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Policy Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="86" width="100" height="17" uuid="159a31df-466e-4312-88b7-63979dbc7ad8">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Agent/Broker]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="103" width="100" height="17" uuid="9511bc00-aa41-4fdd-ad8a-a31af81b1b80">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Peroid of Insurance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="120" width="100" height="17" uuid="c214c1a5-57f1-428b-8b6c-ef5fcd115248">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Product]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="154" width="100" height="17" uuid="b2f91ec4-a75e-41c2-8f62-7a1353f6d5ba">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Date of Payment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="137" width="100" height="17" uuid="1b225dbb-e0f3-43f1-90a9-47c927264f3f">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Payment Details]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="188" width="354" height="17" uuid="1fba0082-d188-4b0f-a107-cf74895af871">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="188" width="100" height="17" uuid="784e5e64-5ee6-4e94-afc2-420c5aff7132">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Payment Number]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="206" width="354" height="17" uuid="b4f86c1a-cdbc-4cac-b43f-dd82f3f6d2de">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_MODE_SETTLEMENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="206" width="100" height="17" uuid="2a8e6a24-775f-4a40-9846-665ce87d0ddf">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Payment Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="223" width="100" height="17" uuid="a5c5bd29-232c-4bda-982e-e0766d4ec5d1">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Payee name]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="274" width="354" height="17" uuid="4b38646e-9e6f-4f33-98ee-285e46c16a28">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PINT_EMP_ID} +"   "+ $F{PINT_INSURED}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="240" width="100" height="17" uuid="14d45f47-1d4a-4b3d-b3a3-499f704e1a1c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[Payee address]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="240" width="354" height="17" uuid="f9bc88eb-8639-4301-a3dc-c1126d550f08">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_ADDR1}+" "+$F{PAPPRH_ADDR2}+" "+$F{PAPPRH_ADDR3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="257" width="354" height="17" uuid="6ac468ef-f7bc-4a5c-bd20-7597abe94480">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_FTR_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="257" width="100" height="17" uuid="23840ad7-be9e-492a-993d-19ebdaecc31e">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Feature No]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="223" width="354" height="17" uuid="dc4cd443-edb2-4ed2-b2c2-27a5b763a6c6">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{PAPPRH_PAY_TO}+"  "+$F{PAPPRH_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="274" width="100" height="17" uuid="71ec88c9-bbb0-4017-b236-e48c16fa65d3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Risk Detail]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="291" width="354" height="17" uuid="dfc5c4c6-b242-4cba-90a9-ca4abacf955d">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{CLMH_LOSS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="308" width="354" height="17" uuid="bc15c116-d579-4899-92eb-6d7bc7874b4c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{CLMH_TXN_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="291" width="100" height="17" uuid="69ccc569-4f9d-4b2c-8144-9fdf5dff2dd6">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Date of loss]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="308" width="100" height="17" uuid="cab84314-33a4-4b0e-9fcd-5769d2a35af2">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Date Registred]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="326" width="354" height="17" uuid="0a55898b-88eb-4436-bc07-9ac314644b92">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{CLMH_NATURE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="326" width="100" height="17" uuid="0b9e1160-0f54-4045-b7bc-2b73a2b8f891">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Cause of loss]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="343" width="354" height="17" uuid="251baea4-4f49-4b53-aa5b-9af00bf0f817">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{NOL_DESC}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="343" width="100" height="17" uuid="ae1be89a-efe6-4377-b333-3933e246ff93">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Category of loss]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="360" width="354" height="17" uuid="183c9892-725c-4c1d-8202-9ab8109dacb3">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{CLMH_PLACE_ACCIDENT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="360" width="100" height="17" uuid="17e38213-f67f-4138-aad3-36677e77a2f8">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Place of Accident]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="377" width="354" height="17" uuid="dd666bf9-6ef5-42fc-9b6b-17ad16b083b4">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[":  "+$F{CLMH_REM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="377" width="100" height="17" uuid="1b0fe2c8-cffe-41df-8a53-7691f6eb499c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Narration/Remark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="403" width="100" height="20" uuid="735fd68b-ad79-4395-8354-c36722e8fc08">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Payment]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="16" y="433" width="140" height="20" uuid="12f10d81-5b50-4a00-965b-ade7ec85bd12">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PAPPRH_FTR_CODE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="(USD) #,##0.00;(USD) (#,##0.00)">
+				<reportElement x="200" y="433" width="353" height="20" uuid="df1d36d6-af74-4d2e-94be-a9d334213109">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PAPPRH_TOT_APPR_FC}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="470" width="160" height="19" uuid="1de5915c-d1d7-4718-8a92-71aa29b9bb57"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name of Re-insurer]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="470" width="215" height="19" uuid="9635df03-8a81-49a4-bd5d-c149d96cee3b"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Re-Insurer %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="385" y="470" width="168" height="19" uuid="37bec43f-3b15-4630-9fa6-72ed57da08dd"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount Recoverable (USD)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="137" width="100" height="17" uuid="9a5562e0-a778-43aa-a6b7-46c6adae4004">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="171" width="352" height="17" uuid="5056a24e-65e0-406b-badd-92bb345392ee">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[":  "+$F{DOC_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="171" width="100" height="17" uuid="2caff9be-27f1-431e-a694-1e87f419a034">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Document No]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="10" y="-59" width="160" height="20" uuid="8f040fc7-f2e8-46a0-ba66-44432901e34e">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{RE_TYPE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="170" y="-59" width="215" height="20" uuid="8cadd598-3d9a-4483-a89b-6e8220c5f3a8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CLAPR_TTY_SHARE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="385" y="-59" width="168" height="20" uuid="c7beeb7b-6912-49c6-826f-f8a0250700c7">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CLAPR_PAY_AMT_BC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="161" splitType="Stretch">
+			<textField>
+				<reportElement x="200" y="-29" width="353" height="36" uuid="1e9c0299-dca7-4dc0-ac20-77a9bd465398"/>
+				<textFieldExpression><![CDATA[$F{PAPPRH_REM}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="-29" width="100" height="36" uuid="044edd86-1ce1-4e10-b271-91c462b5ed25">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Remark]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="-59" width="160" height="20" uuid="ab5a487c-d51a-4bff-917f-2e5616db6b90">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="170" y="-59" width="215" height="20" uuid="76a93fa4-9a85-424b-8183-00a5d6760a4d"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{TotalShare}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="385" y="-59" width="168" height="20" uuid="dab6f337-41fb-4169-ad41-83b3b12cdb1d"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{varTotalAmtShare}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="21" width="100" height="20" uuid="ddcfc82e-5098-48e6-bd1d-f658bf4a306e">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Prepared by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="21" width="100" height="20" uuid="effeb67a-67b9-4b94-b109-1ae1c2c36893">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Checked by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="389" y="21" width="100" height="20" uuid="d8a79b05-c07a-4982-b2cb-7019ee7bf008">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Approved by]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="10" y="81" width="100" height="20" uuid="6789c532-af89-4aa0-80ef-d8da1d80c7be">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:.........................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="195" y="81" width="100" height="20" uuid="3bfb79a2-1d5f-4515-ab35-ebc2e1b83acc">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:.........................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="389" y="81" width="100" height="20" uuid="0af39c8f-d637-4bae-abe3-317192b6fe67">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:.........................]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

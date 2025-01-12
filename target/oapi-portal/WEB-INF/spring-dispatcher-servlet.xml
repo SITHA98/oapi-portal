@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+		
+<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" >
+		<!-- <property name="maxUploadSize" value="100000"/>	 -->	
+</bean>
+<!-- <bean id="handlerMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/> -->
+<!-- <bean name="/welcom.html" class="com.springmvc.controller.HelloController"/>-->
+
+<!-- <context:component-scan base-package="com.springmvc2.controller"/> this for @Controller and @RequestMapping -->
+<context:component-scan base-package="sitha.rupp.controller"/>
+
+<!-- <mvc:annotation-driven/> this line for @PathVariable -->
+<mvc:annotation-driven/>
+<mvc:resources mapping="/lib/**" location="/lib/" />
+<!-- This is use to tell the spring to stop the web sit on Sunday 
+<mvc:interceptors>
+	<bean class="com.springmvchtmlform.controller.DayOfWeekBasedAccessInterceptoer"/>
+</mvc:interceptors>-->
+
+<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	<property name="prefix">
+		<value>/WEB-INF/</value>	
+	</property>
+	<property name="suffix">
+		<value>.jsp</value>
+	</property>
+</bean>
+<mvc:resources mapping="/images/**" location="/images/" />   
+
+<!-- This is to tell spring to read the message property file -->
+<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+	<property name="basename" value="/WEB-INF/message"/>
+	<!-- This property is tell spring to refresh the message property in every second (recommended for developer) -->
+	<property name="cacheSeconds" value="1"/>
+</bean>
+
+</beans>

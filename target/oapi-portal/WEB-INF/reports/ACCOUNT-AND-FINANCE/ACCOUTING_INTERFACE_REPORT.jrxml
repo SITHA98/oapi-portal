@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2020-11-06T16:16:41 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ACCOUTING_INTERFACE_REPORT" pageWidth="695" pageHeight="842" columnWidth="647" leftMargin="28" rightMargin="20" topMargin="19" bottomMargin="20" whenResourceMissingType="Error" isIgnorePagination="true" uuid="e3175119-0bc5-407b-aca1-dd5c39ea5d74">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="UAT3.20"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+IH.IH_SYS_IND
+,IH.IH_JRNL_TYPE
+,IH.IH_DOC_NO
+,TO_CHAR(IH.IH_DOC_DT,'DD-MON-YYYY') AS IH_DOC_DT
+,IH.IH_BATCH_ID
+,IH.IH_SYS_ID
+,IH.IH_PARTY_REF_NO
+,IH.IH_PARTY_BRANCH AS INTERMEDIARY
+,ID.ID_COMPNT2
+,(SELECT AC.AC_DESC FROM RACFIN.IBM_ACCOUNT AC WHERE AC.AC_COMPNT1='01' AND AC.AC_COMPNT2=ID.ID_COMPNT2) AS AC_DESC
+,ID.ID_FC_AMT
+,ID.ID_BC_AMT
+,CASE WHEN ID.ID_BC_AMT>0 THEN ABS(ID.ID_BC_AMT) END AS CREDIT
+,CASE WHEN ID.ID_BC_AMT<0 THEN ABS(ID.ID_BC_AMT) END AS DEBIT
+,ID.ID_COMPNT3
+,ID.ID_LINE_NO
+--,IH.*
+--,ID.*
+FROM RAIMS.GLT_INTERFACE_HEAD IH
+INNER JOIN APIREPORT.GLT_INTERFACE_DETAIL ID ON ID.ID_IH_SYS_ID=IH.IH_SYS_ID
+WHERE
+IH.IH_DOC_DT BETWEEN '01-NOV-2020' AND '06-NOV-2020' 
+AND IH.IH_JRNL_TYPE IN('DNU')
+AND IH.IH_PARTY_REF_NO='P01CV00200391/000/00'
+ORDER BY ID.ID_LINE_NO,ID_COMPNT3 ASC]]>
+	</queryString>
+	<field name="IH_SYS_IND" class="java.lang.String"/>
+	<field name="IH_JRNL_TYPE" class="java.lang.String"/>
+	<field name="IH_DOC_NO" class="java.lang.String"/>
+	<field name="IH_DOC_DT" class="java.lang.String"/>
+	<field name="IH_BATCH_ID" class="java.lang.String"/>
+	<field name="IH_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="IH_PARTY_REF_NO" class="java.lang.String"/>
+	<field name="INTERMEDIARY" class="java.lang.String"/>
+	<field name="ID_COMPNT2" class="java.lang.String"/>
+	<field name="AC_DESC" class="java.lang.String"/>
+	<field name="ID_FC_AMT" class="java.math.BigDecimal"/>
+	<field name="ID_BC_AMT" class="java.math.BigDecimal"/>
+	<field name="CREDIT" class="java.math.BigDecimal"/>
+	<field name="DEBIT" class="java.math.BigDecimal"/>
+	<field name="ID_COMPNT3" class="java.lang.String"/>
+	<field name="ID_LINE_NO" class="java.math.BigDecimal"/>
+	<group name="myGroup">
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="164">
+			<textField>
+				<reportElement x="0" y="90" width="190" height="20" uuid="53d7a2cf-aef0-4c15-a5fd-6ebf94bb6a54"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{IH_PARTY_REF_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="190" y="90" width="120" height="20" uuid="8996b187-65b7-443a-9912-7c8127a86ca9"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{IH_DOC_DT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="90" width="130" height="20" uuid="6fc886ea-88ac-426c-acc1-9938ee248226"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{IH_JRNL_TYPE}+$F{IH_DOC_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="90" width="100" height="20" uuid="58da84da-a1d9-4341-9985-99c4e8d3f326"/>
+				<textFieldExpression><![CDATA[$F{INTERMEDIARY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="100" y="129" width="100" height="30" uuid="65fdfbfa-c4a1-4072-927f-393e053a7453"/>
+				<text><![CDATA[ACCOUNT CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="129" width="104" height="30" uuid="28f62049-2241-462b-b16e-f65ea76ca291"/>
+				<text><![CDATA[ACCOUNT DESC]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="18">
+			<textField>
+				<reportElement x="100" y="0" width="100" height="16" uuid="72f1ab29-90cd-4b6d-a7e4-cd3fac6c180c"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ID_COMPNT2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="200" height="16" uuid="b6058a9e-e455-4b26-a48b-2c9405572817"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{AC_DESC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="400" y="0" width="100" height="16" uuid="bd7d1bc1-0937-4e74-a337-82b238b3d942"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{DEBIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="500" y="0" width="100" height="16" uuid="b2e2ad25-2806-4a40-9503-f2ce370c3dc7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CREDIT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="100" height="16" uuid="c1815cde-fec6-473f-9bfe-fb2110efa591"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{ID_COMPNT3}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Prevent"/>
+	</pageFooter>
+	<summary>
+		<band height="50"/>
+	</summary>
+</jasperReport>

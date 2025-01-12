@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-01-27T10:42:01 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CreditNote" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5a46697e-b6ff-4a1b-9755-2dfd491edfd8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="192"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oracle-db-connection"/>
+	<parameter name="parImageHeader" class="java.lang.String"/>
+	<parameter name="parImageDetail" class="java.lang.String"/>
+	<parameter name="parImageFooter" class="java.lang.String"/>
+	<parameter name="parPENDR_POLICY_NUMBER" class="java.lang.String"/>
+	<parameter name="parVattin" class="java.lang.String"/>
+	<parameter name="parInvoiceNumber" class="java.lang.String"/>
+	<parameter name="parAccount_Code" class="java.lang.String"/>
+	<parameter name="parInvoiceDate" class="java.lang.String"/>
+	<parameter name="parAccMonthYear" class="java.lang.String"/>
+	<parameter name="parINSURED_NAME" class="java.lang.String"/>
+	<parameter name="parADDRESS" class="java.lang.String"/>
+	<parameter name="parProductDesc" class="java.lang.String"/>
+	<parameter name="parEffictiveDate" class="java.lang.String"/>
+	<parameter name="parExpiryDate" class="java.lang.String"/>
+	<parameter name="parPENDR_AMT_BC" class="java.lang.String"/>
+	<parameter name="parAdminFee" class="java.lang.String"/>
+	<parameter name="parInvoideDRCR" class="java.lang.String"/>
+	<parameter name="parPENDR_PREMIUM_AMOUNT" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT SYSDATE FROM DUAL]]>
+	</queryString>
+	<field name="SYSDATE" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="802" splitType="Stretch">
+			<image>
+				<reportElement x="-20" y="245" width="595" height="274" uuid="7c1ab081-a229-4fc5-a161-7cbc639d854b"/>
+				<imageExpression><![CDATA[$P{parImageDetail}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement stretchType="RelativeToBandHeight" x="-20" y="-20" width="595" height="265" uuid="c3a7d228-9b15-4f9d-acd3-3177dea2a54a"/>
+				<imageExpression><![CDATA[$P{parImageHeader}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="-20" y="520" width="595" height="279" uuid="e87e7739-d36e-42af-ad7c-83a3342528f4">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parImageFooter}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="145" y="254" width="123" height="20" uuid="75a1c34a-b5b2-4b28-8948-b577c5731dc7">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parInvoiceNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="438" y="254" width="100" height="24" uuid="a2c5932d-3593-4de9-b986-4985417449d9">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parAccount_Code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="273" width="130" height="20" uuid="dc506bd3-ecb4-47c6-a727-ea2416ed6638"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parAccMonthYear}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="303" width="329" height="30" uuid="4571875d-8c8b-419c-823b-c828b752f646"/>
+				<textFieldExpression><![CDATA[$P{parINSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="331" width="329" height="30" uuid="53485ec6-5fc2-4a41-b166-db047bc3cedb"/>
+				<textFieldExpression><![CDATA[$P{parADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="356" width="284" height="22" uuid="28e4e54a-9526-46ee-afe3-579cfce72af1"/>
+				<textFieldExpression><![CDATA[$P{parVattin}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="430" y="416" width="104" height="20" uuid="5b2459b6-168f-4f43-97c8-d41a42ee7fa3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parExpiryDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="311" y="416" width="118" height="20" uuid="fa4afe51-20bc-4192-b4a9-beaa7ae78739"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parEffictiveDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="165" y="416" width="146" height="20" uuid="e00b9cb0-799b-4884-8f4b-2d5d88508c9b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parPENDR_POLICY_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="45" y="416" width="120" height="20" uuid="f7b137c9-6b79-4c02-971e-344f92515ab4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parProductDesc}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="438" y="490" width="82" height="18" uuid="4f412b04-2502-4ca1-9720-4a7fb98bfb47"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parPENDR_AMT_BC}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="438" y="473" width="82" height="17" uuid="06ce0518-0838-4ad4-8782-25b319085572"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parAdminFee}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="151" y="271" width="100" height="23" uuid="1fd813d9-6f25-4c30-a49e-c229edddea21"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parInvoiceDate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="107" y="573" width="100" height="23" uuid="b4567de4-0b8a-41ab-8603-da806a9f8720">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parInvoideDRCR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="438" y="455" width="82" height="18" uuid="a38264e6-08b7-4ce3-b01c-c648084a8781">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{parPENDR_PREMIUM_AMOUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

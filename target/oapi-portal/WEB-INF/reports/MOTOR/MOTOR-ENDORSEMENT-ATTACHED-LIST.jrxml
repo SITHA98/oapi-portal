@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-02-04T17:02:10 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MOTOR-ENDORSEMENT-ATTACHED-LIST" language="groovy" pageWidth="695" pageHeight="842" columnWidth="635" leftMargin="40" rightMargin="20" topMargin="20" bottomMargin="20" uuid="35e73235-c58d-472b-830e-6c8792ecd8de">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parPolh_extnum" class="java.lang.String"/>
+	<parameter name="parDisplayPolicy" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+--,P.* 
+'' MOTOR_DETAIL
+,M2.PINTMV_SEQNUM
+--,M2.PINTMV_SYS_ID
+--,M2.PINTMV_PINT_SYS_ID
+,M2.PINTMV_REGN_NO
+,M2.PINTMV_MFG_YEAR
+--,M2.PINTMV_MAKE_MODEL
+,M2.PINTMV_MOD_DESC
+,M2.PINTMV_CUBIC_CAPACITY
+,M2.PINTMV_SI_BC
+--,M2.PINTMV_ENGINE_NO
+--,M2.PINTMV_CHASIS_NO
+,M2.PINTMV_PREM_BC
+--,M2.PINTMV_REC_STATUS
+--,M2.* 
+,'' LOAD_DISC
+--,LD.PDISC_EXTNUM
+--,LD.PDISC_REC_STATUS
+,LD.PDISC_PERC
+--,LD.PDISC_AMT_FC
+,'' EXCESS
+--,EX3.PDED_EXTNUM
+,EX3.PDED_COV
+,CASE WHEN EX3.PDED_COV='XSA-05' THEN 'THEFT' ELSE (SELECT CV.COV_DESC FROM RAIMS.INM_MST_COVER CV WHERE CV.COV_CODE=EX3.PDED_COV)END AS EXCESS_DESC
+,EX3.PDED_DEDAMT
+,EX3.PDED_TYPE
+,EX3.PDED_REC_STATUS
+FROM RAIMS.INT_UW_POLH P
+LEFT JOIN RAIMS.INT_UW_PINT_MOTOR M2 ON M2.PINTMV_PINT_SYS_ID=P.POLH_SYS_ID
+LEFT JOIN RAIMS.INT_UW_PINT_PDISC LD ON LD.PDISC_PINTMV_SYS_ID=M2.PINTMV_SYS_ID
+LEFT JOIN RAIMS.INT_UW_PDED EX3 ON EX3.PDED_PINTMV_SYS_ID=LD.PDISC_PINTMV_SYS_ID 
+--WHERE P.POLH_POLNUM='P01CV00200457/000/00' AND P.POLH_EXTNUM='0' --P.POLH_SYS_ID='8870' EXT=16
+WHERE 
+--P.POLH_POLNUM='P01MC00200062/000/00' AND P.POLH_EXTNUM='0' --EXT =1 P.POLH_SYS_ID='6924'
+P.POLH_POLNUM=$P{parPolicyNumber} AND P.POLH_EXTNUM='0' --EXT =1 P.POLH_SYS_ID='6924'
+--AND M2.PINTMV_PINT_SYS_ID='6924' 
+AND M2.PINTMV_SEQNUM IS NOT NULL 
+--AND M2.PINTMV_EXTNUM='1'
+AND M2.PINTMV_EXTNUM=$P{parPolh_extnum}
+ORDER BY M2.PINTMV_SEQNUM ASC]]>
+	</queryString>
+	<field name="MOTOR_DETAIL" class="java.lang.String"/>
+	<field name="PINTMV_SEQNUM" class="java.math.BigDecimal"/>
+	<field name="PINTMV_REGN_NO" class="java.lang.String"/>
+	<field name="PINTMV_MFG_YEAR" class="java.lang.String"/>
+	<field name="PINTMV_CUBIC_CAPACITY" class="java.lang.String"/>
+	<field name="PINTMV_SI_BC" class="java.math.BigDecimal"/>
+	<field name="PINTMV_PREM_BC" class="java.math.BigDecimal"/>
+	<field name="LOAD_DISC" class="java.lang.String"/>
+	<field name="PDISC_PERC" class="java.math.BigDecimal"/>
+	<field name="EXCESS" class="java.lang.String"/>
+	<field name="PDED_COV" class="java.lang.String"/>
+	<field name="EXCESS_DESC" class="java.lang.String"/>
+	<field name="PDED_DEDAMT" class="java.math.BigDecimal"/>
+	<field name="PDED_TYPE" class="java.lang.String"/>
+	<field name="PDED_REC_STATUS" class="java.lang.String"/>
+	<field name="PINTMV_MOD_DESC" class="java.lang.String"/>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{PINTMV_REGN_NO}]]></groupExpression>
+		<groupHeader>
+			<band height="50">
+				<textField>
+					<reportElement x="0" y="0" width="50" height="36" uuid="d2146ee0-1e8c-4069-832d-8e2b422608ee"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_SEQNUM}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="50" y="0" width="133" height="36" isPrintWhenDetailOverflows="true" uuid="e60f4e34-9cd4-44a1-a4e8-14358eff927e"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_REGN_NO}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement stretchType="RelativeToTallestObject" x="183" y="0" width="107" height="36" uuid="a1c9481a-7d5f-4822-be2d-a82c357e263a"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_MOD_DESC}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="290" y="0" width="50" height="36" uuid="8f077e77-69a4-4ee4-a256-323121f2b8f9"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_MFG_YEAR}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="340" y="0" width="50" height="36" uuid="a68b03dc-49fb-4c14-bf71-c3e960dea497"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_CUBIC_CAPACITY}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="390" y="0" width="80" height="36" uuid="913d0ad5-5bc0-4aa0-9c7e-fb52a851d775"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_SI_BC}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="470" y="0" width="70" height="36" uuid="165a9164-4ed2-4549-92f9-7c8948bb2094"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PINTMV_PREM_BC}]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement stretchType="RelativeToBandHeight" x="540" y="0" width="94" height="36" uuid="ca91af85-de67-4816-878b-91de5dd094f9"/>
+					<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+						<topPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement verticalAlignment="Top"/>
+					<textFieldExpression><![CDATA[$F{PDISC_PERC}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="0" y="36" width="634" height="14" uuid="e1188c2c-f102-4fc9-8737-a11d14714cfa">
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					</reportElement>
+					<box leftPadding="5" rightPadding="5">
+						<leftPen lineWidth="0.5"/>
+						<rightPen lineWidth="0.5"/>
+					</box>
+					<textElement>
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Excess]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band>
+				<property name="local_mesure_unitheight" value="pixel"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="82" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="50" width="634" height="32" backcolor="#C0C0C0" uuid="68317df8-5ea2-4bf1-bbe7-c40475586961"/>
+				<box>
+					<topPen lineWidth="0.4" lineStyle="Double"/>
+					<leftPen lineWidth="0.4" lineStyle="Double"/>
+					<bottomPen lineWidth="0.4" lineStyle="Double"/>
+					<rightPen lineWidth="0.4" lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Annexure]]></text>
+			</staticText>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="55">
+			<staticText>
+				<reportElement x="0" y="25" width="50" height="30" uuid="a679128a-40f8-4f71-b43b-0c0d8984b97a">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sr.No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="25" width="133" height="30" uuid="0874a455-d5dc-4904-bc03-2471f14d2136">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Regn.No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="183" y="25" width="107" height="30" uuid="bfc86fd8-a8b3-4345-b492-e997916b60a8">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Make and Model]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="25" width="50" height="30" uuid="6f5b4ffa-1b9a-4ed7-b16d-443692cddc52">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Year of Make]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="25" width="50" height="30" uuid="16d86a1e-aa9d-4c0e-9814-14ff46ef80af">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[H.P. or CC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="25" width="80" height="30" uuid="ffe2d832-92b7-4468-9ed5-8bd2d05b9688">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sum Insured USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="470" y="25" width="70" height="30" uuid="ff0098bd-1d5d-472a-bbc1-383ce828f474">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Refund
+Premium]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="540" y="25" width="94" height="30" uuid="9ac29c94-2277-4945-81a5-fca3f30562bf">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No Claim Discount (NCD)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="634" height="24" uuid="40acd1df-b111-422d-a394-53ab5170fb9e">
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Attching to and forming part of Policy "+$P{parDisplayPolicy}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="634" height="20" uuid="6835f990-4c0e-4243-997c-e13ab7ec46ba">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EXCESS_DESC} +" : USD "+$F{PDED_DEDAMT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="107" splitType="Stretch"/>
+	</summary>
+</jasperReport>

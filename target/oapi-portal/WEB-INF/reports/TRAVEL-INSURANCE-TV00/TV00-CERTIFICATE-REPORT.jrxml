@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2020-11-23T10:40:58 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TV00-CERTIFICATE-REPORT" pageWidth="595" pageHeight="842" whenNoDataType="NoDataSection" columnWidth="547" leftMargin="28" rightMargin="20" topMargin="0" bottomMargin="20" uuid="e3175119-0bc5-407b-aca1-dd5c39ea5d74">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="UAT-19.6"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="parPlan1" class="java.lang.String"/>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parPlan2" class="java.lang.String"/>
+	<parameter name="parCEOSignature" class="java.lang.String"/>
+	<parameter name="parBackground" class="java.lang.String"/>
+	<parameter name="parLHILogo" class="java.lang.String"/>
+	<parameter name="parEmailIcon" class="java.lang.String"/>
+	<parameter name="par24h" class="java.lang.String"/>
+	<parameter name="parWorld" class="java.lang.String"/>
+	<parameter name="parCamflag" class="java.lang.String"/>
+	<parameter name="parStamp" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[WITH ALIST AS (
+SELECT 
+P.POLH_SYS_ID
+,P.POLH_SRNUM
+,P.POLH_POLNUM
+,P.POLH_DISPLAY_POLNUM 
+,SUBSTR(P.POLH_DISPLAY_POLNUM,6,19) AS CERTIFICATE_NO
+,P.POLH_DAYS
+,P.POLH_CREST
+,P.POLH_GA_CODE
+,(SELECT GO.CAMD_ENTITY_DESC FROM RAIMS.CTM_CARRY_ALL_MAS_DETL GO WHERE GO.CAMD_ENTITY_CODE=P.POLH_GA_CODE) AS DESTINATION 
+,P.POLH_PLAN
+,(SELECT B.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN(P.POLH_DEBIT_PARTY)) AS INT_NAME
+,P.POLH_DEBIT_PARTY AS INT_CODE
+,UPPER(P.POLH_ASSRDNM) AS INSURED_NAME
+,P.POLH_SALESMAN
+,UPPER((SELECT E.EMP_FIRST_NAME||' '||EMP_LAST_NAME FROM RAIMS.CVT_EMP E WHERE E.EMP_ID IN(P.POLH_SALESMAN))) AS AGENCY_SALE_NAME
+,P.POLH_CLIENT AS INSURED_CODE
+,P.POLH_DEBIT_PARTY
+,(SELECT T.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH T WHERE T.CVBR_BRANCH_CODE=P.POLH_DEBIT_PARTY) AS INTERMEDIARY_NAME
+,replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' ') AS ADDRESS
+,'N/A' AS BUSINESS_REG_NO
+,P.POLH_INDUSTRY AS BUSINESS_OCCUPATION_CODE
+,(SELECT IND_DESC FROM RAIMS.INM_MST_IND WHERE IND_CODE=P.POLH_INDUSTRY) AS BUSINESS_OCCUPATION
+,TO_CHAR(P.POLH_ISSDT,'DD-MON-YYYY') ISSUE_DATE
+,TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY')EFFECTIVE_DATE
+,TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE
+,G2.PINT_GEO AS GEO_LIMIT
+,case when G2.PINT_GEO='01' THEN 'Standard-24 Hr Worldwide' else 'Working Hr within Cambodia' end AS TERRITORIAL_LIMIT
+,ROUND(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC,2) AS PREMIUM
+,P.POLH_ADJ_PREM_BC AS ADJUST_PREMIUM
+,P.POLH_FEES3_BC AS ADMIN_FEE
+,(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC + P.POLH_FEES3_BC) AS TOTAL
+,G2.PINT_INSURED
+,G2.PINT_SEX,TO_CHAR(G2.PINT_DOB,'DD-MON-YYYY') PINT_DOB,G2.PINT_AGE,G2.PINT_MASS_NAME,G2.PINT_SI_BC,(G2.PINT_PREM_BC+P.POLH_ADJ_PREM_BC)PINT_PREM_BC,G2.PINT_SYS_ID
+,G2.PINT_ASSIGNEE
+,G2.PINT_OCCUPATION
+,G2.PINT_PASSPORT_NO
+,G2.PINT_NATIONALITY
+,G2.PINT_EMP_COUNTRY
+,G3.* 
+FROM RAIMS.INT_UW_POLH P
+INNER JOIN RAIMS.INT_UW_PINT_MED G2 ON P.POLH_SYS_ID=G2.PINT_POLH_SYS_ID
+INNER JOIN (SELECT
+G3.PCOV_SYS_ID
+,G3.PCOV_PINTMED_SYS_ID
+,G3.PCOV_COVER
+,(SELECT C.COV_DESC||' '||C.COV_LIMIT_DESC FROM RAIMS.INM_MST_COVER C WHERE C.COV_CODE=G3.PCOV_COVER) AS COVER_DESC
+,G3.PCOV_SI_FC
+,G3.PCOV_SI_BC
+FROM RAIMS.INT_UW_PCOV G3
+) G3 ON G3.PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID
+--WHERE P.POLH_POLNUM = 'P01TV00200018/000/00'
+WHERE P.POLH_POLNUM=$P{parPolicyNumber}
+)SELECT rownum as rowNumber,A.* FROM ALIST A ORDER BY A.COVER_DESC ASC]]>
+	</queryString>
+	<field name="POLH_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SYS_ID"/>
+	</field>
+	<field name="POLH_SRNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SRNUM"/>
+	</field>
+	<field name="POLH_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_POLNUM"/>
+	</field>
+	<field name="POLH_DISPLAY_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_DISPLAY_POLNUM"/>
+	</field>
+	<field name="INT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_NAME"/>
+	</field>
+	<field name="INT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_CODE"/>
+	</field>
+	<field name="INSURED_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_NAME"/>
+	</field>
+	<field name="INSURED_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_CODE"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="BUSINESS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_REG_NO"/>
+	</field>
+	<field name="BUSINESS_OCCUPATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_OCCUPATION"/>
+	</field>
+	<field name="EFFECTIVE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EFFECTIVE_DATE"/>
+	</field>
+	<field name="EXPIRY_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+	</field>
+	<field name="PINT_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PINT_SYS_ID"/>
+	</field>
+	<field name="PREMIUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PREMIUM"/>
+	</field>
+	<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+	<field name="BUSINESS_OCCUPATION_CODE" class="java.lang.String"/>
+	<field name="GEO_LIMIT" class="java.lang.String"/>
+	<field name="TERRITORIAL_LIMIT" class="java.lang.String"/>
+	<field name="ADMIN_FEE" class="java.math.BigDecimal"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="PINT_INSURED" class="java.lang.String"/>
+	<field name="PINT_SEX" class="java.lang.String"/>
+	<field name="PINT_DOB" class="java.lang.String"/>
+	<field name="PINT_AGE" class="java.math.BigDecimal"/>
+	<field name="PINT_MASS_NAME" class="java.lang.String"/>
+	<field name="PINT_SI_BC" class="java.math.BigDecimal"/>
+	<field name="PINT_PREM_BC" class="java.math.BigDecimal"/>
+	<field name="ADJUST_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="ROWNUMBER" class="java.math.BigDecimal"/>
+	<field name="POLH_DAYS" class="java.lang.String"/>
+	<field name="POLH_SALESMAN" class="java.lang.String"/>
+	<field name="AGENCY_SALE_NAME" class="java.lang.String"/>
+	<field name="PINT_ASSIGNEE" class="java.lang.String"/>
+	<field name="PINT_OCCUPATION" class="java.lang.String"/>
+	<field name="PINT_PASSPORT_NO" class="java.lang.String"/>
+	<field name="PINT_NATIONALITY" class="java.lang.String"/>
+	<field name="PINT_EMP_COUNTRY" class="java.lang.String"/>
+	<field name="PCOV_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PCOV_PINTMED_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PCOV_COVER" class="java.lang.String"/>
+	<field name="COVER_DESC" class="java.lang.String"/>
+	<field name="PCOV_SI_FC" class="java.math.BigDecimal"/>
+	<field name="PCOV_SI_BC" class="java.math.BigDecimal"/>
+	<field name="POLH_PLAN" class="java.lang.String"/>
+	<field name="POLH_CREST" class="java.lang.String"/>
+	<field name="POLH_GA_CODE" class="java.lang.String"/>
+	<field name="DESTINATION" class="java.lang.String"/>
+	<field name="INTERMEDIARY_NAME" class="java.lang.String"/>
+	<field name="ISSUE_DATE" class="java.lang.String"/>
+	<field name="CERTIFICATE_NO" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="821">
+			<image hAlign="Center">
+				<reportElement x="330" y="660" width="189" height="112" uuid="865be1b3-b67c-4bb5-be54-78cdb5a48667">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parCEOSignature}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement mode="Transparent" x="-24" y="5" width="585" height="812" uuid="fb937424-0ad7-480a-a5d9-609f06625d84"/>
+				<graphicElement>
+					<pen lineWidth="4.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="281" y="579" width="263" height="29" uuid="e743e068-72a6-4fc8-92f2-21650654af40"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="140" y="579" width="141" height="29" uuid="0d6855fc-df8c-4100-8e21-4e7c96d42d46"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="0" y="579" width="140" height="29" uuid="989a5eab-4d19-466c-9674-dcc05e63a98d"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="0" y="533" width="545" height="29" uuid="1e0f5f69-1b58-45fd-8f23-bd63b3d16822"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="1" y="489" width="545" height="29" uuid="2c98a822-9a84-4fe7-9e9f-f97a50d51039"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="1" y="410" width="545" height="29" uuid="6f28b8d1-bbdf-466f-bf8e-0ffba0fb2d62"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle radius="15">
+				<reportElement x="-2" y="325" width="545" height="29" uuid="f760b6f8-e15f-4a3c-8a14-0729102f941c"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="10" y="220" width="260" height="30" uuid="32f665bd-f9b8-40fd-a4d1-27c171f99a74"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Policy No.	: "+$F{POLH_DISPLAY_POLNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="283" width="250" height="27" uuid="ffe87a27-5ba6-47c4-b048-6cfd2e46a2ff"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Departure Date	: "+$F{EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="253" width="251" height="26" uuid="16713db2-02be-4c9c-b285-aaa92dbd4b5b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Destination	: "+$F{PINT_NATIONALITY}+"-"+$F{PINT_EMP_COUNTRY}+"-"+$F{PINT_NATIONALITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="250" width="260" height="29" uuid="796de7b6-ead6-4476-b69a-ff3dd69073ae"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Plan Type	: "+$F{POLH_PLAN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="220" width="260" height="30" uuid="56c3a6a3-f05f-4c64-ba4d-6ce32d7a7aa9"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Issue Date	: "+$F{ISSUE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="281" width="260" height="30" uuid="8f4015f1-4dba-4ef4-903e-e0f4942f3b64"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Return Date	: "+$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="281" y="365" width="260" height="30" uuid="e99ed5b4-700c-4884-b841-6db07fc3c014"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Passport Number: "+$F{PINT_PASSPORT_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="11" y="365" width="251" height="30" uuid="ec52fb31-9064-40b3-a68b-3bc6d5799047"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{INSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="0" y="10" width="220" height="70" uuid="4f478c74-c9fe-4150-8051-03808e9118c4"/>
+				<imageExpression><![CDATA[$P{parLHILogo}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="-1" y="72" width="547" height="38" uuid="51a31425-8d51-4f53-884f-88e06f9416c6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="28" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CERTIFICATE OF INSURANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="111" width="546" height="56" uuid="4d2b5329-7298-4e9b-b368-2c97c408c799"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[CONGRATULATION!
+You are now protected. Life is easy when you are worry free. Thank you for having
+confidence in us to protect you throughout your life’s journeys and advantures.]]></text>
+			</staticText>
+			<rectangle radius="15">
+				<reportElement x="0" y="183" width="545" height="29" uuid="b3248e45-c17f-4406-854c-3a10b6c3cb92"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="183" width="219" height="29" uuid="21d0a038-7df2-492d-833a-9aee78d89084"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LY HOUR TRAVEL INSURANCE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="281" y="183" width="258" height="29" uuid="af67adda-00bd-4ce8-b33f-e59ea389aedc"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CERTIFICATE No:"+$F{CERTIFICATE_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="270" y="185" width="0" height="25" uuid="1c9f0f21-690a-4a15-a603-a8efc54a2d8f">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="250" width="260" height="0" uuid="b20e3760-745c-41d5-81f0-8d80b11d28f5">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="250" width="260" height="0" uuid="c0c8bdd4-a559-472b-8486-cee440849fcc">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="223" width="0" height="25" uuid="58e69ef1-b61e-4499-8f39-96493ae6f870">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="281" width="260" height="0" uuid="f4ba249f-6498-4fd5-83e2-5281096eb50e">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="281" width="260" height="0" uuid="5cd02176-300e-464b-9cff-b37c986aa100">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="254" width="0" height="25" uuid="2dc28203-7826-4b6f-9fd7-68e89f19fc3c">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="313" width="260" height="0" uuid="dd0cec46-28b5-4f85-a2f5-b5ad3c9bfb22">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="313" width="260" height="0" uuid="92bee8a8-c950-4210-b30a-dd385cbb3f32">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="284" width="0" height="25" uuid="31d55395-1d27-46b7-8d8d-de49b59ea8f8">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="325" width="219" height="29" uuid="7ec009c5-c563-451b-8e41-529db100cef6"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INSURED NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="368" width="0" height="25" uuid="0e6f7433-2338-49e9-a787-ae17ed861115">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="395" width="260" height="0" uuid="41576d72-9daf-40ee-a613-0b370212466d">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="395" width="260" height="0" uuid="19b4f997-7ee7-4377-bddf-3482c9ac365c">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="410" width="219" height="29" uuid="879b6d62-5e65-4079-b115-893e59e88ebd"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TYPE OF BENEFITS]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="11" y="456" width="15" height="15" uuid="d937d037-ef33-4178-8e98-357d38abf335">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</ellipse>
+			<staticText>
+				<reportElement x="40" y="452" width="50" height="22" forecolor="#000000" uuid="fb587c70-0003-4d22-9c0d-4c722cfc2ed9"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Plan 1]]></text>
+			</staticText>
+			<ellipse>
+				<reportElement x="301" y="456" width="15" height="15" uuid="c77ecc04-12f7-40a6-ac87-3b2553ec8a8f">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</ellipse>
+			<staticText>
+				<reportElement x="330" y="452" width="50" height="22" forecolor="#000000" uuid="69de5ad1-8bb2-41cb-ba6a-fdb2d27bf4ff"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Plan 2]]></text>
+			</staticText>
+			<rectangle radius="10">
+				<reportElement x="10" y="493" width="120" height="21" backcolor="#000000" uuid="96742560-b90a-4c0d-b249-21b41c449bbd"/>
+				<graphicElement>
+					<pen lineColor="#A8A8A8"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="16" y="493" width="104" height="22" forecolor="#FFFFFF" uuid="3dfbb40f-a6e0-4474-812c-0f95162e3556"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GENERAL ENQUIRY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="489" width="371" height="29" uuid="a02ccbb5-6ef7-4301-b948-ff15f28be0fa"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[customerservice@lyhourinsurance.com]]></text>
+			</staticText>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="140" y="494" width="29" height="19" uuid="ef124ebf-9d39-4e73-a4dc-bdb05e3e731d"/>
+				<imageExpression><![CDATA[$P{parEmailIcon}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="30" y="533" width="510" height="29" uuid="58f8559f-c48d-4161-8ee4-a36aa0877c49"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMERGENCY MEDICAL ASSISTANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="579" width="114" height="29" uuid="603d2f3c-a952-4cc2-8f32-84c0a7501590"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[+855 85 66 0000]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="170" y="580" width="110" height="28" uuid="5890e450-3248-4715-8d23-1ce259be3565"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[+66 2 180 5598]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="316" y="579" width="229" height="29" uuid="faebf191-7327-4d02-afe4-5c790fd04bf5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lyhourinsurance@euro-assistance.co]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="629" width="316" height="22" uuid="2e6d5fee-b22a-439e-a5af-58cd208551d4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FOR AND ON BEHALF OF LY HOUR INSURANCE PLC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="250" y="749" width="280" height="22" uuid="7b6f76da-f29f-4980-b475-662fa421f62b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Authorized Signatory]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="772" width="280" height="22" uuid="b3af2ad2-6a6c-4c35-906d-a1e30e972f52"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9" isBold="false"/>
+				</textElement>
+				<text><![CDATA[*Terms & Conditions Applied]]></text>
+			</staticText>
+			<image>
+				<reportElement x="14" y="446" width="30" height="24" uuid="1b4bcc5b-b866-428e-9210-32de0fafc554">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parPlan1}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="303" y="447" width="27" height="24" uuid="7ea08bf9-59b0-4abc-bb61-9350cc836ec4">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parPlan2}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="7" y="539" width="20" height="17" uuid="57be8813-9789-4f05-8c9a-85fce8618ffb">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{par24h}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="6" y="584" width="20" height="17" uuid="4fec4778-16c3-424f-a681-23ce6aef62e0"/>
+				<imageExpression><![CDATA[$P{parCamflag}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="148" y="585" width="20" height="17" uuid="3912b836-a782-49f1-986d-4b7c4872713f"/>
+				<imageExpression><![CDATA[$P{parWorld}]]></imageExpression>
+			</image>
+			<image vAlign="Middle">
+				<reportElement x="290" y="585" width="21" height="17" uuid="8060feee-c5c4-4478-9464-a85b35203ca4"/>
+				<imageExpression><![CDATA[$P{parEmailIcon}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="1" y="477" width="260" height="0" uuid="f4293fbc-cdfb-449b-b43d-0874f3145653">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="477" width="260" height="0" uuid="fe63d27d-d921-49a6-85e8-99d95c4aef4c">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="449" width="0" height="25" uuid="e753e018-4a8c-4dd7-9631-c71754cb9e5e">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#A8A8A8"/>
+				</box>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<image hAlign="Center">
+				<reportElement x="290" y="660" width="119" height="90" uuid="143518be-c422-4a83-b19b-e0cd710ae720">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parStamp}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Prevent"/>
+	</pageFooter>
+</jasperReport>

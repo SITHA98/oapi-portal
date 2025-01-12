@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-02-04T17:21:43 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MOTOR-SCHEDULE" pageWidth="595" pageHeight="942" columnWidth="535" leftMargin="40" rightMargin="20" topMargin="20" bottomMargin="20" uuid="35e73235-c58d-472b-830e-6c8792ecd8de">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="Crosstab_CH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CG" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CT" mode="Opaque" backcolor="#000000">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab_CD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Dataset1" uuid="b41de86d-c7fd-45b0-8806-cd1adeaa438f">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+		<parameter name="parPolicyNumber" class="java.lang.String"/>
+		<queryString language="SQL">
+			<![CDATA[WITH ALIST AS (
+SELECT 
+P.POLH_SYS_ID,
+P.POLH_SRNUM,
+P.POLH_POLNUM
+,FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,P.POLH_EXTNUM) AS POLH_DISPLAY_POLNUM
+,(SELECT B.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN(P.POLH_DEBIT_PARTY)) AS INT_NAME,
+P.POLH_DEBIT_PARTY AS INT_CODE,
+UPPER(P.POLH_ASSRDNM) AS INSURED_NAME,
+P.POLH_CLIENT AS INSURED_CODE,
+P.POLH_DEBIT_PARTY,
+replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' ') AS ADDRESS,
+'N/A' AS BUSINESS_REG_NO,
+P.POLH_INDUSTRY AS BUSINESS_OCCUPATION_CODE,
+(SELECT IND_DESC FROM RAIMS.INM_MST_IND WHERE IND_CODE=P.POLH_INDUSTRY) AS BUSINESS_OCCUPATION,
+TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY') EFFECTIVE_DATE,
+TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE,
+'CAMBODIA, VIETNAM, LAOS AND THAILAND' AS DISTRICT,
+'18-65 year-old' AS AGE_LIMIT,
+ROUND(P.POLH_PREM_FC,2) AS PREMIUM,
+'1.00' AS ADMIN_FEE,
+(P.POLH_PREM_FC+1) AS TOTAL,
+--P2.PINT_POLH_SYS_ID,
+--P2.PINT_OBJECT,P2.PINT_PLAN,
+--P2.PCOV_COVER,
+--(SELECT C.COV_DESC FROM RAIMS.INM_MST_COVER C WHERE COV_CODE=P2.PCOV_COVER) AS COVER_DESC,
+--P2.PCOV_SI_BC AS COVER_AMOUNT,
+--P2.PCOV_SI_FC AS PCOV_SI_FC,
+--P2.PCOV_RT
+--,P2.PINT_EMP_ID
+P2.*
+FROM RAIMS.INT_UW_POLH P
+INNER JOIN(
+            SELECT G2.PINT_POLH_SYS_ID,
+            --G2.PINT_OBJECT,
+            G2.PINT_PLAN,
+            G3.PCOV_COVER,
+            (SELECT COV_DESC FROM RAIMS.INM_MST_COVER WHERE COV_CODE=G3.PCOV_COVER) COVER_DESC
+            --case when G2.PINT_PLAN='PLANE-02' then G3.PCOV_SI_FC else 0 end PLANE_02,
+            --case when G2.PINT_PLAN='PLANC-02' then G3.PCOV_SI_FC else 0 end PLANC_02
+            ,G3.PCOV_SI_BC
+            ,G3.PCOV_RT
+            --,G2.PINT_EMP_ID
+            FROM RAIMS.INT_UW_PINT_MED G2
+            INNER JOIN RAIMS.INT_UW_PCOV G3 ON G2.PINT_SYS_ID=G3.PCOV_PINTMED_SYS_ID
+            INNER JOIN RAIMS.INM_MST_MED_COV G4 ON G2.PINT_PLAN=G4.MED_CODE_CODE
+--            WHERE G2.PINT_POLH_SYS_ID= '9187'
+            --WHERE G2.PINT_POLH_SYS_ID= P.POLH_SYS_ID --'9187'
+            --and G3.PCOV_COVER='HC002'
+            GROUP BY G2.PINT_POLH_SYS_ID,G2.PINT_OBJECT,G2.PINT_PLAN,G3.PCOV_COVER,G3.PCOV_SI_FC,G3.PCOV_SI_BC,G3.PCOV_RT
+            --,G2.PINT_EMP_ID
+)P2 ON P2.PINT_POLH_SYS_ID=P.POLH_SYS_ID
+--WHERE P.POLH_POLNUM = 'P01HC00200007/000/01'
+WHERE P.POLH_EXTNUM='0' AND P.POLH_POLNUM = $P{parPolicyNumber}
+)SELECT 
+A.* 
+,FN_GET_NOF_PERSON_ATTACHED_LIST(A.POLH_SYS_ID) AS NOF_PERSON
+,A.PCOV_SI_BC/ CASE WHEN (SELECT CP.MED_COV_DAYS FROM RAIMS.INM_MST_MED_COV CP WHERE CP.MED_COV_CLS_CODE='HC00' AND CP.MED_COV_CODE=A.PCOV_COVER AND CP.MED_CODE_CODE=A.PINT_PLAN)=0 THEN 1 ELSE (SELECT CP.MED_COV_DAYS FROM RAIMS.INM_MST_MED_COV CP WHERE CP.MED_COV_CLS_CODE='HC00' AND CP.MED_COV_CODE=A.PCOV_COVER AND CP.MED_CODE_CODE=A.PINT_PLAN) END AS COV_AMT
+,(SELECT CP.MED_COV_DAYS FROM RAIMS.INM_MST_MED_COV CP WHERE CP.MED_COV_CLS_CODE='HC00' AND CP.MED_COV_CODE=A.PCOV_COVER AND CP.MED_CODE_CODE=A.PINT_PLAN) AS NOF_DAY
+FROM ALIST A
+ORDER BY A.COVER_DESC]]>
+		</queryString>
+		<field name="POLH_SYS_ID" class="java.math.BigDecimal"/>
+		<field name="POLH_SRNUM" class="java.math.BigDecimal"/>
+		<field name="POLH_POLNUM" class="java.lang.String"/>
+		<field name="POLH_DISPLAY_POLNUM" class="java.lang.String"/>
+		<field name="INT_NAME" class="java.lang.String"/>
+		<field name="INT_CODE" class="java.lang.String"/>
+		<field name="INSURED_NAME" class="java.lang.String"/>
+		<field name="INSURED_CODE" class="java.lang.String"/>
+		<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+		<field name="ADDRESS" class="java.lang.String"/>
+		<field name="BUSINESS_REG_NO" class="java.lang.String"/>
+		<field name="BUSINESS_OCCUPATION_CODE" class="java.lang.String"/>
+		<field name="BUSINESS_OCCUPATION" class="java.lang.String"/>
+		<field name="EFFECTIVE_DATE" class="java.lang.String"/>
+		<field name="EXPIRY_DATE" class="java.lang.String"/>
+		<field name="DISTRICT" class="java.lang.String"/>
+		<field name="AGE_LIMIT" class="java.lang.String"/>
+		<field name="PREMIUM" class="java.math.BigDecimal"/>
+		<field name="ADMIN_FEE" class="java.lang.String"/>
+		<field name="TOTAL" class="java.math.BigDecimal"/>
+		<field name="PINT_POLH_SYS_ID" class="java.math.BigDecimal"/>
+		<field name="PINT_PLAN" class="java.lang.String"/>
+		<field name="PCOV_COVER" class="java.lang.String"/>
+		<field name="COVER_DESC" class="java.lang.String"/>
+		<field name="PCOV_SI_BC" class="java.math.BigDecimal"/>
+		<field name="PCOV_RT" class="java.math.BigDecimal"/>
+		<field name="COV_AMT" class="java.math.BigDecimal"/>
+		<field name="NOF_DAY" class="java.math.BigDecimal"/>
+		<field name="NOF_PERSON" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parPolh_extnum" class="java.lang.String"/>
+	<parameter name="parEndorsementText" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+P.POLH_POLNUM
+,P.POLH_COB
+,P.POLH_EXTNUM
+,FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,'0') AS OLD_POLICY
+,FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum}) AS DISPLAY_POLICY
+,P.POLH_SYS_ID,
+(SELECT B.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN(P.POLH_DEBIT_PARTY)) AS INT_NAME,
+P.POLH_DEBIT_PARTY AS INT_CODE,
+P.POLH_CLIENT AS INSURED_CODE,
+P.POLH_DEBIT_PARTY,
+SUBSTR(P.POLH_POST_PERIOD,1,3) ||'-20'|| SUBSTR(P.POLH_POST_PERIOD,4,2)AS POLH_POST_PERIOD,
+replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' ') AS ADDRESS,
+'N/A' AS BUSINESS_REG_NO,
+P.POLH_INDUSTRY AS BUSINESS_OCCUPATION_CODE,
+(SELECT IND_DESC FROM RAIMS.INM_MST_IND WHERE IND_CODE=P.POLH_INDUSTRY) AS BUSINESS_OCCUPATION,
+UPPER(P.POLH_ASSRDNM) AS INSURED_NAME,
+P.POLH_COB AS PRODUCT_CODE,
+(SELECT C.CLS_DESC FROM RAIMS.INM_MST_CLASS C WHERE CLS_CODE=P.POLH_COB) AS PRODUCT_DESC,
+P.POLH_SI_BC AS SUM_INSURED,
+FN_GET_ADMIN_FEE(P.POLH_POLNUM,P.POLH_COB,P.POLH_EXTNUM) AS ADMIN_FEE
+,P.POLH_PREM_BC AS SYS_GROSS_PREMIUM
+,FN_GET_PREMIUM(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum}) AS FN_GET_PREMIUM
+,FN_GET_ADJUSTMENT_AMOUNT(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum}) AS FN_GET_ADJUSTMENT_AMOUNT
+,FN_GET_MOTOR_ENDORSEMENT_PREMIUM(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum}) AS PREMIUM
+,CASE WHEN FN_GET_MOTOR_ENDORSEMENT_PREMIUM(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum})<0 THEN 'Refund Premium' ELSE 'Additional Premium' END AS TEXT_ADD_PRE_REFUND
+,TO_CHAR(P.POLH_ISSDT,'DD-MON-YYYY') AS ISSUE_DATE,
+TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY')EFFECTIVE_DATE,
+TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE
+--,P.* 
+,TO_CHAR(PENDR.PENDR_EFFDT,'DD-MON-YYYY') AS ENDOR_EFFICTIVE_DATE
+,M2.PINTMV_USG_CODE
+,M2.PINTMV_REC_STATUS
+,(SELECT U.USG_DESC FROM RAIMS.INM_MST_USAGE U WHERE U.USG_CODE=M2.PINTMV_USG_CODE) AS USAGE_DESC
+,FN_GET_TYPE_OF_COVER(M2.PINTMV_SYS_ID,P.POLH_COB) AS TYPE_OF_COVER
+--,FN_GET_MOTOR_ADD_DELETE(P.POLH_SYS_ID,$P{parPolh_extnum},(SELECT DISTINCT(MX.PINTMV_REC_STATUS) FROM RAIMS.INT_UW_PINT_MOTOR MX WHERE MX.PINTMV_SEQNUM IS NOT NULL AND MX.PINTMV_PINT_SYS_ID=P.POLH_SYS_ID AND MX.PINTMV_EXTNUM=$P{parPolh_extnum})) AS DETAIL_ANNEXURE
+--,FN_GET_MOTOR_IN_VIEW_ADD_DEL(P.POLH_POLNUM,P.POLH_COB,$P{parPolh_extnum}) AS IN_VIEW
+FROM RAIMS.INT_UW_POLH P 
+INNER JOIN RAIMS.INT_UW_PENDR PENDR ON P.POLH_SYS_ID=PENDR.PENDR_POLH_SYS_ID AND PENDR.PENDR_EXTNUM=$P{parPolh_extnum}
+LEFT JOIN RAIMS.INT_UW_PINT_MOTOR M2 ON M2.PINTMV_PINT_SYS_ID=P.POLH_SYS_ID AND M2.PINTMV_SEQNUM='1'
+WHERE P.POLH_POLNUM=$P{parPolicyNumber} AND P.POLH_EXTNUM='0'
+ --P.POLH_SYS_ID='8870' EXT=16]]>
+	</queryString>
+	<field name="POLH_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="POLH_POLNUM" class="java.lang.String"/>
+	<field name="INT_NAME" class="java.lang.String"/>
+	<field name="INT_CODE" class="java.lang.String"/>
+	<field name="INSURED_NAME" class="java.lang.String"/>
+	<field name="INSURED_CODE" class="java.lang.String"/>
+	<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+	<field name="ADDRESS" class="java.lang.String"/>
+	<field name="BUSINESS_REG_NO" class="java.lang.String"/>
+	<field name="BUSINESS_OCCUPATION_CODE" class="java.lang.String"/>
+	<field name="BUSINESS_OCCUPATION" class="java.lang.String"/>
+	<field name="EFFECTIVE_DATE" class="java.lang.String"/>
+	<field name="EXPIRY_DATE" class="java.lang.String"/>
+	<field name="PREMIUM" class="java.math.BigDecimal"/>
+	<field name="ADMIN_FEE" class="java.math.BigDecimal"/>
+	<field name="POLH_EXTNUM" class="java.math.BigDecimal"/>
+	<field name="OLD_POLICY" class="java.lang.String"/>
+	<field name="DISPLAY_POLICY" class="java.lang.String"/>
+	<field name="POLH_POST_PERIOD" class="java.lang.String"/>
+	<field name="PRODUCT_CODE" class="java.lang.String"/>
+	<field name="PRODUCT_DESC" class="java.lang.String"/>
+	<field name="SUM_INSURED" class="java.math.BigDecimal"/>
+	<field name="SYS_GROSS_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="FN_GET_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="FN_GET_ADJUSTMENT_AMOUNT" class="java.math.BigDecimal"/>
+	<field name="ISSUE_DATE" class="java.lang.String"/>
+	<field name="ENDOR_EFFICTIVE_DATE" class="java.lang.String"/>
+	<field name="PINTMV_USG_CODE" class="java.lang.String"/>
+	<field name="PINTMV_REC_STATUS" class="java.lang.String"/>
+	<field name="USAGE_DESC" class="java.lang.String"/>
+	<field name="DETAIL_ANNEXURE" class="java.lang.String"/>
+	<field name="POLH_COB" class="java.lang.String"/>
+	<field name="TYPE_OF_COVER" class="java.lang.String"/>
+	<field name="IN_VIEW" class="java.lang.String"/>
+	<field name="TEXT_ADD_PRE_REFUND" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="120" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="82" width="540" height="30" backcolor="#C0C0C0" uuid="68317df8-5ea2-4bf1-bbe7-c40475586961"/>
+				<box>
+					<topPen lineWidth="0.4" lineStyle="Double"/>
+					<leftPen lineWidth="0.4" lineStyle="Double"/>
+					<bottomPen lineWidth="0.4" lineStyle="Double"/>
+					<rightPen lineWidth="0.4" lineStyle="Double"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ENDORSEMENT SCHEDULE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="244" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="71" width="110" height="18" uuid="309483f3-d3dd-4801-9624-3c269c51d863">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agency Name]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="71" width="250" height="18" uuid="6ddf3502-4048-4d73-b336-92d41b3e33cb">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{INT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="71" width="84" height="18" uuid="b9ad9807-faf8-4edd-9435-54d281e1f082">
+					<property name="local_mesure_unitheight" value="pixel"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{INT_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="361" y="71" width="90" height="18" uuid="31f7040f-63cd-4bd0-a26b-825f2e84b666"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Agency Code]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="89" width="250" height="18" uuid="72da30cb-7084-4686-916a-86fb4d1ed881">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{INSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="89" width="84" height="18" uuid="1e264c39-726b-4152-b7ed-1c3e91b13f7c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+ $F{INSURED_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="361" y="89" width="90" height="18" uuid="ab4197b8-585d-4f80-ad10-85c61a9d8345">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="89" width="110" height="18" uuid="a58aaa70-93a0-470d-90db-3e27f0cf4830">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Name]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="107" width="240" height="36" uuid="7cafdff3-2e56-4b26-a10a-ce1449248783"/>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="107" width="110" height="36" uuid="6762b9b5-f02a-437b-8818-1f39b866c631">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Address]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="361" y="107" width="90" height="18" uuid="e878823d-2536-4ce1-bd5c-e6f731356f2f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Code]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="451" y="107" width="84" height="18" uuid="a43e6499-3a21-4f38-a1a2-ec0083aaf6ba">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[": "+$F{BUSINESS_REG_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="143" width="250" height="18" uuid="767791c7-5336-4b4c-8de9-6b372642d336">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[": "+$F{BUSINESS_OCCUPATION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="143" width="110" height="18" uuid="4425e037-2c7a-4caf-9e07-5bcb015a12cd">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Business Occupation]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="161" width="250" height="18" uuid="8ce4d796-61c9-40b2-afec-4f17f9addf34">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[": From "+$F{EFFECTIVE_DATE} +" To "+$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="161" width="110" height="18" uuid="486b2492-9f3b-43d5-bfea-2678e89eb442">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Period of Insurance]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="221" width="180" height="18" backcolor="#ADADAD" uuid="9bf90a1e-df84-489b-afc2-593e07638fce">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[THE COVER]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="220" width="540" height="1" uuid="540f9b76-7b75-4767-956e-cd75a02bf310">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="110" y="107" width="10" height="36" backcolor="#ADADAD" uuid="635f43ca-1313-4200-89e4-57aaba26cec2">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="389" y="0" width="150" height="30" uuid="01758d1f-91b2-4e3c-aa67-a993214f475f"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OLD_POLICY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="0" width="78" height="30" uuid="e13439f0-c0f5-4830-a288-ac1fd1bf2caf"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Endorsement No]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="79" y="0" width="126" height="30" uuid="3ab302aa-efc1-449b-a300-ee9b57a8e19c"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DISPLAY_POLICY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="205" y="0" width="184" height="30" uuid="d0fbaf66-dd4e-4e8c-8534-061559f66bab"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[attching to and forming part of Policy No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="30" width="68" height="20" uuid="5f087a8b-0518-452b-8797-38e09f7e77f9"/>
+				<textElement verticalAlignment="Top"/>
+				<text><![CDATA[in the name of]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="69" y="30" width="470" height="20" uuid="db4f4789-abc9-4ed5-9a16-3f2337138dd1">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="179" width="110" height="30" uuid="84bd4b02-98f3-4294-b7d0-91a136cc8b33">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Effective Date of Endorsement]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="179" width="250" height="30" uuid="aac7c842-88da-4566-a785-3a6b88703197"/>
+				<textFieldExpression><![CDATA[": "+$F{ENDOR_EFFICTIVE_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="94">
+			<textField>
+				<reportElement x="110" y="2" width="250" height="18" uuid="5f2bbfd4-f64e-4111-8838-c4b98ea809f0"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{USAGE_DESC}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="2" width="110" height="18" uuid="4ba99ede-f218-40a6-9899-448cd8631f83">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vehicle Classification]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="110" height="18" uuid="e281a478-788b-49ca-9dfc-ecf8cf41855b">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Type of Cover]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="110" y="20" width="250" height="18" uuid="fe3f5211-7731-450e-b832-ffe8c161e8e2"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{TYPE_OF_COVER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="47" width="180" height="18" backcolor="#ADADAD" uuid="0824885c-1eb6-4660-a4ef-7b09a2474d9d">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[THE MOTOR VEHICLE]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="46" width="540" height="1" uuid="06f3d2f2-0047-45c7-826d-092d73f6e6b2">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="0" y="70" width="110" height="18" uuid="af067c9c-5537-4ebb-bc21-c96e3d9d1395">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[As per Annexure]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<summary>
+		<band height="366" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="-1" y="4" width="180" height="18" backcolor="#ADADAD" uuid="fa44fe79-ab49-4a9e-a911-a59e6bb9324c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[THE PREMIUM]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="540" height="2" uuid="1d35aaad-b482-462d-8d4d-99541be010e9">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</textField>
+			<staticText>
+				<reportElement x="160" y="48" width="110" height="18" backcolor="#ADADAD" uuid="d0632947-47f3-48cd-ae33-d997afe5767f">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[ADMIN FEE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="66" width="110" height="18" backcolor="#ADADAD" uuid="460f7d2f-08c4-47d2-9ef0-55b54a2c489e">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="30" width="30" height="18" backcolor="#ADADAD" uuid="97c5d324-137e-479d-8d7e-7263943fb0a8">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="48" width="30" height="18" backcolor="#ADADAD" uuid="f42db99f-8742-4b69-acd2-b88dbaac8685">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="270" y="66" width="30" height="18" backcolor="#ADADAD" uuid="d7fc799d-dff5-41e2-ace7-f331b4ecf5c0">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="237" width="139" height="29" uuid="9a902b0e-143a-4afb-b217-dc3202625f2d"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[For and on behalf of
+LY HOUR INSURANCE PLC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="317" width="136" height="16" uuid="7d5580fc-f1be-4766-b786-5585c277bda1"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Authorized Signature]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="403" y="332" width="22" height="12" uuid="43ee668e-f10a-4aaf-937a-7d54290b4cb1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="425" y="332" width="10" height="12" uuid="a1a94259-e62d-4c84-b003-609f67aea5c6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="436" y="332" width="84" height="12" uuid="deabe796-59b3-40f7-b955-ce41042f8478"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="1" y="96" width="540" height="2" uuid="9ce171a5-0f0e-469e-8b60-a20d1f94948b">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</textField>
+			<staticText>
+				<reportElement x="300" y="48" width="90" height="18" backcolor="#ADADAD" uuid="6a4bafec-5f7e-4bfd-8ba8-1795861dc9eb">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[0.00]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="300" y="30" width="90" height="18" uuid="a95bba05-44a2-4ec8-9cd8-d6c720e19fd3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PREMIUM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="300" y="66" width="90" height="18" uuid="c558a738-12f8-46a0-bfef-fa4cb27e22b6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PREMIUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="30" width="110" height="18" uuid="6950c86a-7766-40c1-b290-d32aae045df5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{TEXT_ADD_PRE_REFUND}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="110" width="534" height="120" uuid="a1616d88-16ea-4171-a1a9-0236ba484f49"/>
+				<textFieldExpression><![CDATA[$P{parEndorsementText}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

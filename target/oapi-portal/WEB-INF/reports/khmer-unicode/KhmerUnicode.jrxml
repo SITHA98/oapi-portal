@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2020-06-30T22:11:01 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="KhmerUnicode" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="afab18f5-2f24-4ddf-b858-9ca6dbf986ab">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT sysdate
+FROM dual]]>
+	</queryString>
+	<field name="sysdate" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="73" splitType="Stretch">
+			<staticText>
+				<reportElement x="280" y="9" width="250" height="55" uuid="2695d051-acd5-4737-a5de-47140513b6e1"/>
+				<textElement>
+					<font fontName="Khmer OS" size="20" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[ខ្ញុំនៅប្រទេសកម្ពុជា]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="300" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="440" height="43" uuid="336553c6-f202-43e6-839b-f0c10ad64822"/>
+				<textElement>
+					<font fontName="Khmer OS Battambang" size="20"/>
+				</textElement>
+				<text><![CDATA[មិនសុខចិត្តទេកម្ពុជា Customer Code :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="340" height="240" uuid="76b525cf-d9a4-43ca-9eb5-e0fa01519124"/>
+				<textElement>
+					<font fontName="Khmer OS Battambang" size="16"/>
+				</textElement>
+				<text><![CDATA[កូនឈើដុះលូតលាស់លឿន រៀបចំទីតាំងដាំបន្លែ ជីគីមី
+ពលកម្មថែទាំចម្ការឈើ
+ការធ្វើដំណើរ
+ស្រះចិញ្ចឹមត្រី
+ពូជកង្កែប
+ចំណីមាន់
+ពលកម្មថែទាំសត្វ
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="417" y="143" width="100" height="30" uuid="b34a0848-07dc-4c5d-92d0-33866129749f"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[English language]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="340" y="16" width="235" height="30" uuid="5cc84491-a0d4-4446-b586-6a0e5fc3e1b0">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d656cf96-990f-44e8-b2dd-47c2dff438e8"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{sysdate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
