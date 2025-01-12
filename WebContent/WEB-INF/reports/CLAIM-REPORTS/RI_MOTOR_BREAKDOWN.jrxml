@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-02-24T09:11:53 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RI_MOTOR_BREAKDOWN" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0" uuid="d7111943-7073-4f22-a2bb-98ff5c29eb85">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="parClaimNumber" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+RIC.CLAPR_SEQ_NO
+,RIC.CLAPR_TTY_CODE
+,RIC.CLAPR_TTY_TYPE
+,FN_GET_RE_INSURANCE_TYPE(RIC.CLAPR_TTY_TYPE) AS RE_TYPE
+,RIC.CLAPR_TTY_SHARE
+,RIC.CLAPR_AMT_FC
+,RIC.CLAPR_AMT_BC
+FROM RAIMS.INT_CLM_HEAD C1
+INNER JOIN RAIMS.INT_RI_CLM_APPOR RIC ON RIC.CLAPR_CLMNUM=C1.CLMH_CLMNUM
+WHERE 
+RIC.CLAPR_AMT_BC>0
+AND C1.CLMH_CLMNUM=$P{parClaimNumber}
+--AND C1.CLMH_CLMNUM='C01CV00200174'; 
+--AND C1.CLMH_CLMNUM='C01PV00200269']]>
+	</queryString>
+	<field name="CLAPR_SEQ_NO" class="java.math.BigDecimal"/>
+	<field name="CLAPR_TTY_CODE" class="java.lang.String"/>
+	<field name="CLAPR_TTY_TYPE" class="java.lang.String"/>
+	<field name="RE_TYPE" class="java.lang.String"/>
+	<field name="CLAPR_TTY_SHARE" class="java.math.BigDecimal"/>
+	<field name="CLAPR_AMT_FC" class="java.math.BigDecimal"/>
+	<field name="CLAPR_AMT_BC" class="java.math.BigDecimal"/>
+	<variable name="TotalAmountRecover" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{CLAPR_AMT_BC}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="40">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="-21" y="20" width="150" height="20" uuid="0b326da0-13c4-4d7d-945a-e1e304dbfd8e"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Re-Insurance Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="129" y="20" width="100" height="20" uuid="d0597315-377f-4fa6-886e-220793e1e1b1"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Re-Insurance %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="229" y="20" width="130" height="20" uuid="761cf929-1828-4159-9aca-691697bff1f5"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount Recoverable]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-21" y="0" width="380" height="20" uuid="6019b71a-12d5-46da-8de3-a6fbb839450e"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reserve Re-Insurance Breakdown]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="-21" y="0" width="150" height="20" uuid="58f13643-15b8-4ee9-bbbe-10465cb24fd6">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{RE_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="129" y="0" width="100" height="20" uuid="49b9fcf2-6921-460e-9bed-459642b1575c">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CLAPR_TTY_SHARE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="229" y="0" width="130" height="20" uuid="41215b3b-395a-4046-a2c3-43a1f1d21683">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CLAPR_AMT_BC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="-21" y="0" width="250" height="20" uuid="8f11b278-a7f1-4167-840b-d5b5428c5afc"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="229" y="0" width="130" height="20" uuid="7732fe17-e60a-48a4-9a6e-f26198bdfe7a"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{TotalAmountRecover}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

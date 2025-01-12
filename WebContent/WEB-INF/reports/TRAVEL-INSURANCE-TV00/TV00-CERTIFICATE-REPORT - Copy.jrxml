@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2020-10-23T15:00:08 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TV00-CERTIFICATE-REPORT" pageWidth="595" pageHeight="842" columnWidth="547" leftMargin="28" rightMargin="20" topMargin="19" bottomMargin="20" whenResourceMissingType="Error" isIgnorePagination="true" uuid="e3175119-0bc5-407b-aca1-dd5c39ea5d74">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="UAT-19.6"/>
+	<parameter name="parPlan1" class="java.lang.String"/>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parPlan2" class="java.lang.String"/>
+	<parameter name="parCEOSignature" class="java.lang.String"/>
+	<parameter name="parBackground" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[WITH ALIST AS (
+SELECT 
+P.POLH_SYS_ID
+,P.POLH_SRNUM
+,P.POLH_POLNUM
+,P.POLH_DISPLAY_POLNUM 
+,P.POLH_DAYS
+,P.POLH_CREST
+,P.POLH_GA_CODE
+,(SELECT GO.CAMD_ENTITY_DESC FROM RAIMS.CTM_CARRY_ALL_MAS_DETL GO WHERE GO.CAMD_ENTITY_CODE=P.POLH_GA_CODE) AS DESTINATION 
+,P.POLH_PLAN
+,(SELECT B.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH B WHERE CVBR_BRANCH_CODE IN(P.POLH_DEBIT_PARTY)) AS INT_NAME
+,P.POLH_DEBIT_PARTY AS INT_CODE
+,UPPER(P.POLH_ASSRDNM) AS INSURED_NAME
+,P.POLH_SALESMAN
+,UPPER((SELECT E.EMP_FIRST_NAME||' '||EMP_LAST_NAME FROM RAIMS.CVT_EMP E WHERE E.EMP_ID IN(P.POLH_SALESMAN))) AS AGENCY_SALE_NAME
+,P.POLH_CLIENT AS INSURED_CODE
+,P.POLH_DEBIT_PARTY
+,(SELECT T.CVBR_BRANCH_NAME FROM RAIMS.IBM_PARTY_BRANCH T WHERE T.CVBR_BRANCH_CODE=P.POLH_DEBIT_PARTY) AS INTERMEDIARY_NAME
+,replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' ') AS ADDRESS
+,'N/A' AS BUSINESS_REG_NO
+,P.POLH_INDUSTRY AS BUSINESS_OCCUPATION_CODE
+,(SELECT IND_DESC FROM RAIMS.INM_MST_IND WHERE IND_CODE=P.POLH_INDUSTRY) AS BUSINESS_OCCUPATION
+,TO_CHAR(P.POLH_ISSDT,'DD-MON-YYYY') ISSUE_DATE
+,TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY')EFFECTIVE_DATE
+,TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE
+,G2.PINT_GEO AS GEO_LIMIT
+,case when G2.PINT_GEO='01' THEN 'Standard-24 Hr Worldwide' else 'Working Hr within Cambodia' end AS TERRITORIAL_LIMIT
+,ROUND(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC,2) AS PREMIUM
+,P.POLH_ADJ_PREM_BC AS ADJUST_PREMIUM
+,P.POLH_FEES3_BC AS ADMIN_FEE
+,(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC + P.POLH_FEES3_BC) AS TOTAL
+,G2.PINT_INSURED
+,G2.PINT_SEX,TO_CHAR(G2.PINT_DOB,'DD-MON-YYYY') PINT_DOB,G2.PINT_AGE,G2.PINT_MASS_NAME,G2.PINT_SI_BC,(G2.PINT_PREM_BC+P.POLH_ADJ_PREM_BC)PINT_PREM_BC,G2.PINT_SYS_ID
+,G2.PINT_ASSIGNEE
+,G2.PINT_OCCUPATION
+,G2.PINT_PASSPORT_NO
+,G2.PINT_NATIONALITY
+,G2.PINT_EMP_COUNTRY
+,G3.* 
+FROM RAIMS.INT_UW_POLH P
+INNER JOIN RAIMS.INT_UW_PINT_MED G2 ON P.POLH_SYS_ID=G2.PINT_POLH_SYS_ID
+INNER JOIN (SELECT
+G3.PCOV_SYS_ID
+,G3.PCOV_PINTMED_SYS_ID
+,G3.PCOV_COVER
+,(SELECT C.COV_DESC||' '||C.COV_LIMIT_DESC FROM RAIMS.INM_MST_COVER C WHERE C.COV_CODE=G3.PCOV_COVER) AS COVER_DESC
+,G3.PCOV_SI_FC
+,G3.PCOV_SI_BC
+FROM RAIMS.INT_UW_PCOV G3
+) G3 ON G3.PCOV_PINTMED_SYS_ID=G2.PINT_SYS_ID
+--WHERE P.POLH_POLNUM = 'P01TV00200018/000/00'
+WHERE P.POLH_POLNUM=$P{parPolicyNumber}
+)SELECT rownum as rowNumber,A.* FROM ALIST A ORDER BY A.COVER_DESC ASC]]>
+	</queryString>
+	<field name="POLH_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SYS_ID"/>
+	</field>
+	<field name="POLH_SRNUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_SRNUM"/>
+	</field>
+	<field name="POLH_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_POLNUM"/>
+	</field>
+	<field name="POLH_DISPLAY_POLNUM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLH_DISPLAY_POLNUM"/>
+	</field>
+	<field name="INT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_NAME"/>
+	</field>
+	<field name="INT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INT_CODE"/>
+	</field>
+	<field name="INSURED_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_NAME"/>
+	</field>
+	<field name="INSURED_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INSURED_CODE"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="BUSINESS_REG_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_REG_NO"/>
+	</field>
+	<field name="BUSINESS_OCCUPATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="BUSINESS_OCCUPATION"/>
+	</field>
+	<field name="EFFECTIVE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EFFECTIVE_DATE"/>
+	</field>
+	<field name="EXPIRY_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+	</field>
+	<field name="PINT_SYS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PINT_SYS_ID"/>
+	</field>
+	<field name="PREMIUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="PREMIUM"/>
+	</field>
+	<field name="POLH_DEBIT_PARTY" class="java.lang.String"/>
+	<field name="BUSINESS_OCCUPATION_CODE" class="java.lang.String"/>
+	<field name="GEO_LIMIT" class="java.lang.String"/>
+	<field name="TERRITORIAL_LIMIT" class="java.lang.String"/>
+	<field name="ADMIN_FEE" class="java.math.BigDecimal"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="PINT_INSURED" class="java.lang.String"/>
+	<field name="PINT_SEX" class="java.lang.String"/>
+	<field name="PINT_DOB" class="java.lang.String"/>
+	<field name="PINT_AGE" class="java.math.BigDecimal"/>
+	<field name="PINT_MASS_NAME" class="java.lang.String"/>
+	<field name="PINT_SI_BC" class="java.math.BigDecimal"/>
+	<field name="PINT_PREM_BC" class="java.math.BigDecimal"/>
+	<field name="ADJUST_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="ROWNUMBER" class="java.math.BigDecimal"/>
+	<field name="POLH_DAYS" class="java.lang.String"/>
+	<field name="POLH_SALESMAN" class="java.lang.String"/>
+	<field name="AGENCY_SALE_NAME" class="java.lang.String"/>
+	<field name="PINT_ASSIGNEE" class="java.lang.String"/>
+	<field name="PINT_OCCUPATION" class="java.lang.String"/>
+	<field name="PINT_PASSPORT_NO" class="java.lang.String"/>
+	<field name="PINT_NATIONALITY" class="java.lang.String"/>
+	<field name="PINT_EMP_COUNTRY" class="java.lang.String"/>
+	<field name="PCOV_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PCOV_PINTMED_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PCOV_COVER" class="java.lang.String"/>
+	<field name="COVER_DESC" class="java.lang.String"/>
+	<field name="PCOV_SI_FC" class="java.math.BigDecimal"/>
+	<field name="PCOV_SI_BC" class="java.math.BigDecimal"/>
+	<field name="POLH_PLAN" class="java.lang.String"/>
+	<field name="POLH_CREST" class="java.lang.String"/>
+	<field name="POLH_GA_CODE" class="java.lang.String"/>
+	<field name="DESTINATION" class="java.lang.String"/>
+	<field name="INTERMEDIARY_NAME" class="java.lang.String"/>
+	<field name="ISSUE_DATE" class="java.lang.String"/>
+	<group name="myGroup">
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="802">
+			<image>
+				<reportElement x="-17" y="-12" width="577" height="814" uuid="ad6e7a88-0ccb-4eb7-a435-1de32fc1d8a9">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parBackground}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="110" y="267" width="160" height="30" uuid="32f665bd-f9b8-40fd-a4d1-27c171f99a74"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLH_DISPLAY_POLNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="330" width="160" height="27" uuid="ffe87a27-5ba6-47c4-b048-6cfd2e46a2ff"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="300" width="250" height="26" uuid="16713db2-02be-4c9c-b285-aaa92dbd4b5b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{PINT_NATIONALITY}+","+$F{PINT_EMP_COUNTRY}+","+$F{PINT_NATIONALITY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="297" width="170" height="29" uuid="796de7b6-ead6-4476-b69a-ff3dd69073ae"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLH_PLAN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="267" width="170" height="30" uuid="56c3a6a3-f05f-4c64-ba4d-6ce32d7a7aa9"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{ISSUE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="370" y="328" width="170" height="30" uuid="8f4015f1-4dba-4ef4-903e-e0f4942f3b64"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="380" y="404" width="160" height="26" uuid="e99ed5b4-700c-4884-b841-6db07fc3c014"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_PASSPORT_NO}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="402" width="260" height="30" uuid="ec52fb31-9064-40b3-a68b-3bc6d5799047"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{INSURED_NAME}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="10" y="480" width="240" height="24" uuid="1b4bcc5b-b866-428e-9210-32de0fafc554">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parPlan1}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="280" y="480" width="240" height="24" uuid="7ea08bf9-59b0-4abc-bb61-9350cc836ec4">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parPlan2}]]></imageExpression>
+			</image>
+			<image hAlign="Center">
+				<reportElement x="250" y="640" width="280" height="90" uuid="865be1b3-b67c-4bb5-be54-78cdb5a48667">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parCEOSignature}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Prevent"/>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-03-26T13:31:25 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HC00-New-AttachedList" pageWidth="1095" pageHeight="1095" orientation="Landscape" columnWidth="1055" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e3175119-0bc5-407b-aca1-dd5c39ea5d74">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="parPolh_sys_id" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+G2.PINT_SYS_ID
+,G2.PINT_POLH_SYS_ID
+,G2.PINT_COB
+,G2.PINT_EXTNUM
+,G2.PINT_SEQNUM
+,P.POLH_POLNUM
+,FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,'0') AS DISPLAY_POLICY
+,P.POLH_ASSRDNM
+,'HEALTHCARE INSURANCE' AS CLASS_OF_POLICY
+,G2.PINT_EMP_ID
+,G2.PINT_INSURED
+,G2.PINT_SEX
+,TO_CHAR(G2.PINT_DOB,'DD-MON-YYYY') PINT_DOB
+,G2.PINT_AGE
+,G2.PINT_DESIGNATION
+,G2.PINT_PLAN
+,TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY') EFFECTIVE_DATE
+,TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') EXPIRY_DATE
+,G2.PINT_PREM_BC AS PREMIUM
+--,G2.* 
+FROM RAIMS.INT_UW_POLH P
+INNER JOIN RAIMS.INT_UW_PINT_MED G2 ON G2.PINT_POLH_SYS_ID=P.POLH_SYS_ID
+--WHERE G2.PINT_POLH_SYS_ID='4134' AND P.POLH_EXTNUM='0' --'9187' 
+WHERE G2.PINT_POLH_SYS_ID=$P{parPolh_sys_id} AND P.POLH_EXTNUM='0' AND G2.PINT_EXTNUM='0' --'9187' 
+ORDER BY G2.PINT_SEQNUM ASC]]>
+	</queryString>
+	<field name="PINT_SEQNUM" class="java.math.BigDecimal"/>
+	<field name="PINT_EMP_ID" class="java.lang.String"/>
+	<field name="PINT_SEX" class="java.lang.String"/>
+	<field name="PINT_DESIGNATION" class="java.lang.String"/>
+	<field name="PINT_PLAN" class="java.lang.String"/>
+	<field name="PINT_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PINT_POLH_SYS_ID" class="java.math.BigDecimal"/>
+	<field name="PINT_COB" class="java.lang.String"/>
+	<field name="PINT_EXTNUM" class="java.math.BigDecimal"/>
+	<field name="POLH_ASSRDNM" class="java.lang.String"/>
+	<field name="CLASS_OF_POLICY" class="java.lang.String"/>
+	<field name="PINT_INSURED" class="java.lang.String"/>
+	<field name="PINT_DOB" class="java.lang.String"/>
+	<field name="PINT_AGE" class="java.math.BigDecimal"/>
+	<field name="EFFECTIVE_DATE" class="java.lang.String"/>
+	<field name="EXPIRY_DATE" class="java.lang.String"/>
+	<field name="PREMIUM" class="java.math.BigDecimal"/>
+	<field name="POLH_POLNUM" class="java.lang.String"/>
+	<field name="DISPLAY_POLICY" class="java.lang.String"/>
+	<variable name="v_total" class="java.lang.Number" calculation="Sum">
+		<variableExpression><![CDATA[$F{PREMIUM}]]></variableExpression>
+	</variable>
+	<group name="myGroup">
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="212" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<rectangle>
+				<reportElement x="33" y="68" width="997" height="38" uuid="5d8ee770-190e-4807-b066-6c19837a762f"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="36" y="71" width="991" height="31" backcolor="#BABABA" uuid="643e0e8c-3352-4983-8d4f-8d9155924df1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="186" y="136" width="843" height="20" uuid="b38c91cc-3b2a-4a39-8df1-0980c8f6f07b"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{POLH_ASSRDNM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="71" width="980" height="30" uuid="96d90b07-5e03-4a02-bbd7-eb53fd4537c7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["LIST ATTACHING TO AND FORMING PART OF POLICY NO. "+$F{DISPLAY_POLICY}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="136" width="111" height="20" uuid="66f47fe4-5291-40c1-90df-b678b63c3a0e"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[INSURED NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="33" y="156" width="111" height="17" uuid="de4ee1d9-3694-4579-9e69-9ed74522174c"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[CLASS OF POLICY]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="186" y="173" width="843" height="17" uuid="32448e0e-a0ba-4a41-b4cc-95edcb796c1e"/>
+				<textFieldExpression><![CDATA[": "+$F{EFFECTIVE_DATE} +" TO "+$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="173" width="142" height="17" uuid="90ae4c24-e2c9-4ebc-9ea4-214babe2401e"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PERIOD OF INSURANCE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="186" y="156" width="843" height="17" uuid="a31714c7-cc7e-442a-a397-fbd45c737b2e"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[": "+$F{CLASS_OF_POLICY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement x="30" y="0" width="40" height="30" uuid="f48c6062-9ae2-40d1-b393-5d6c97c54e1f"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="262" height="30" uuid="67616684-cfdc-44ff-9c44-5ea409e46983"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Insured Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="332" y="0" width="50" height="30" uuid="4ec93377-6b0c-4b56-a2ec-0ed37b608efb"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Gender]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="382" y="0" width="100" height="30" uuid="9ba591ed-2f3a-46a6-a43c-9fdfc06df486"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date of Birth]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="482" y="0" width="50" height="30" uuid="efe4e970-7c62-4905-9195-9de7a2a86c68"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Age]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="532" y="0" width="120" height="30" uuid="ee8f7585-f63f-4a5f-921d-e045b347a5af"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Occupation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="652" y="0" width="70" height="30" uuid="8f8231a8-f83f-42fa-9cb8-8541799d9570"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Plan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="722" y="0" width="100" height="30" uuid="9344bf53-2635-481d-9941-50f298ca85d0"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Effective Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="822" y="0" width="100" height="30" uuid="1c0d0753-3120-4e0d-a297-a9e49ff4d577"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Expiry Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="922" y="0" width="104" height="30" uuid="46891b14-042b-4fd7-b740-8b841304161c"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Annual Premium(USD)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30">
+			<textField>
+				<reportElement x="30" y="0" width="40" height="30" uuid="59e51d24-7a6b-4cc6-9664-2e23b98984f2"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_SEQNUM}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="0" width="262" height="30" uuid="f9f0aa7c-eedd-4a38-810e-006e0f1810e0"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_INSURED}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="332" y="0" width="50" height="30" uuid="4e89ec0f-ac41-4617-b1ae-8eb41b007cc6"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_SEX}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="382" y="0" width="100" height="30" uuid="f420fbdf-361d-4053-9cdc-b329885e5b49"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_DOB}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="482" y="0" width="50" height="30" uuid="0c588c0b-546b-45ab-b59a-7a2f58dac62e"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_AGE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="532" y="0" width="120" height="30" uuid="61a08829-70ba-48f2-9e1b-8f2db5b381bf"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_DESIGNATION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="652" y="0" width="70" height="30" uuid="6fc549ec-37d4-43c5-bf34-26c46e91736c"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PINT_PLAN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="722" y="0" width="100" height="30" uuid="98927446-d163-4e4f-a832-c4656f5d63f9"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="822" y="0" width="100" height="30" uuid="590cff0a-e867-4ae8-a33b-dbb353f86d50"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="922" y="0" width="104" height="30" uuid="db272848-0a47-4280-80f3-a737e59feb0f"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PREMIUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band splitType="Prevent"/>
+	</pageFooter>
+	<summary>
+		<band height="177" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout"/>
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="69" y="80" width="10" height="20" uuid="85f2b445-522b-49c6-8b76-4a2972425b14">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="80" y="80" width="84" height="20" uuid="77862803-ef38-4f25-873d-9f18ce0d0f94">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="36" y="80" width="31" height="20" uuid="c0148fe4-b4e7-46c1-814b-51a2bd3a6a31">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="922" y="0" width="104" height="30" uuid="28ddcb85-917b-4990-8781-181bcc9cb7d5"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{v_total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="30" y="0" width="892" height="30" uuid="b4490f75-3285-4787-adb9-22ed59704fe6"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Grand Total :]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

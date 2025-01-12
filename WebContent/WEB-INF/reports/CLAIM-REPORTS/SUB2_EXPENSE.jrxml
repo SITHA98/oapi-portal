@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-02-23T12:00:00 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SUB2_EXPENSE" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="0" bottomMargin="0" uuid="a26a076e-0d6a-493f-87eb-e5fb1c0873fb">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<parameter name="parClaimNumber" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+--*
+CEPD.CLMED_PCL_PREFIX
+,(SELECT DISTINCT(PCL_NAME) FROM RAIMS.INM_MST_CL_PAY_TO WHERE PCL_PARTY_TYPE=CEPD.CLMED_PARTY_TYPE AND PCL_PREFIX=CEPD.CLMED_PCL_PREFIX) AS FEE_DESC
+,CEPD.CLMED_PARTY_TYPE
+,CEPD.CLMED_EXP_BC
+FROM RAIMS.INT_CLM_HEAD C1
+INNER JOIN RAIMS.INT_CLM_EXP CEXP ON CEXP.CLME_CLMH_SYS_ID=C1.CLMH_SYS_ID AND CEXP.CLME_REC_STATUS!='D'
+LEFT JOIN RAIMS.INT_CLM_EXP_DETL CEPD ON CEPD.CLMED_CLME_SYS_ID= CEXP.CLME_SYS_ID
+WHERE C1.CLMH_CLMNUM=$P{parClaimNumber}]]>
+	</queryString>
+	<field name="CLMED_PCL_PREFIX" class="java.lang.String"/>
+	<field name="CLMED_PARTY_TYPE" class="java.lang.String"/>
+	<field name="CLMED_EXP_BC" class="java.math.BigDecimal"/>
+	<field name="FEE_DESC" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement x="91" y="0" width="123" height="30" uuid="8b65d659-1240-486e-88c1-6f8944f43625"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Claim Detail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="0" width="107" height="30" uuid="0b124dac-6dc4-476d-9242-8e446df6c362"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Amount of claim cost]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="91" y="0" width="123" height="30" uuid="91da5000-b67a-4663-81f3-9093e87e5a4a"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{FEE_DESC}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00;(#,##0.00)">
+				<reportElement x="214" y="0" width="107" height="30" uuid="83aeb3fe-9fdb-4290-ad8b-0063704c2e09"/>
+				<box leftPadding="5" rightPadding="5">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{CLMED_EXP_BC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

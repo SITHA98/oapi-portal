@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-03-26T10:20:53 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Cond_Clause_OnSchedule" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e42f4c7a-e37a-4eee-a496-2ddf59269146">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<parameter name="parPolh_sys_id" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT P1.PCOND_CODE AS PCOND_CODE,C2.COND_DESC AS PCOND_DESC FROM RAIMS.INT_UW_PCOND P1 
+INNER JOIN RAIMS.INM_MST_COND C2 ON P1.PCOND_CODE=C2.COND_CODE 
+WHERE P1.PCOND_POLH_SYS_ID=$P{parPolh_sys_id}
+ORDER BY C2.COND_DESC ASC]]>
+	</queryString>
+	<field name="PCOND_CODE" class="java.lang.String"/>
+	<field name="PCOND_DESC" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="0" y="0" width="100" height="15" uuid="546b5b9d-a4eb-4672-9751-62c7c26032c6">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PCOND_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="454" height="15" uuid="bf3c6694-778a-4bcd-9bb9-3ccc886d98a0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{PCOND_DESC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

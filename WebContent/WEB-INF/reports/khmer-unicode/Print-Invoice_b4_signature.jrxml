@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2021-01-28T08:48:47 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Print-Invoice" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5a46697e-b6ff-4a1b-9755-2dfd491edfd8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="192"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="LHI-LIVE"/>
+	<parameter name="parImageHeader" class="java.lang.String"/>
+	<parameter name="parImageDetail" class="java.lang.String"/>
+	<parameter name="parImageFooter" class="java.lang.String"/>
+	<parameter name="parPolicyNumber" class="java.lang.String"/>
+	<parameter name="parVattin" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+'DNU'||P.POLH_PREM_DOCNUM AS INVOICE,
+P.POLH_DEBIT_PARTY AS ACCOUNT_CODE,
+TO_CHAR(P.POLH_ISSDT,'DD-MON-YYYY') INVOICE_DATE,
+--TO_CHAR(P.POLH_POST_PERIOD,'DD-MON-YYYY') AS ACC_MONTH_YEAR,
+SUBSTR(POLH_POST_PERIOD,1,3) ||'-20'|| SUBSTR(POLH_POST_PERIOD,4,2) AS ACC_MONTH_YEAR,
+UPPER(P.POLH_BENFNM) AS CUSTOMER_NAME,
+regexp_replace(replace(replace(P.POLH_ASSRD_ADDR,chr(10),' '),chr(13),' '), '[[:space:]]+', chr(32)) AS ADDRESS,
+'' AS VAT_TIN,
+--'PRODUCT' AS PRODUCT,
+(SELECT CLS_DESC FROM RAIMS.INM_MST_CLASS WHERE CLS_CODE=P.POLH_COB) AS PRODUCT,
+FN_GET_POLICY_FORMAT(P.POLH_POLNUM,P.POLH_COB,P.POLH_EXTNUM) AS POLICY_NO,
+--P.POLH_DISPLAY_POLNUM AS POLICY_NO,
+TO_CHAR(P.POLH_ISSDT,'DD-MON-YYYY') AS ISSUED_DATE,
+TO_CHAR(P.POLH_STPERIOD,'DD-MON-YYYY') AS EFFECTIVE_DATE,
+TO_CHAR(P.POLH_ENDPERIOD,'DD-MON-YYYY') AS EXPIRY_DATE,
+ROUND(P.POLH_PREM_BC+P.POLH_ADJ_PREM_BC,2) AS GROSS_PREMIUM,
+P.POLH_ADJ_PREM_BC AS ADJUST_PREMIUM,
+P.POLH_FEES3_BC AS ADMIN_FEE
+,CASE WHEN P.POLH_COB='HC00' THEN
+    NVL(P.POLH_PREM_BC,0)+NVL(P.POLH_ADJ_PREM_BC,0)+NVL(P.POLH_FEES3_BC,0)
+ ELSE
+	(SELECT TX.IH_NET_INV_BC_AMT FROM RAIMS.GLT_INTERFACE_HEAD TX WHERE TX.IH_POLH_SYS_ID=P.POLH_SYS_ID AND TX.IH_JRNL_SOURCE='UW' AND TX.IH_JRNL_TYPE IN ('DNU','CNU') AND TX.IH_PARTY_BRANCH NOT LIKE 'CN000%' AND TX.IH_POLH_EXTNUM='0')
+END AS TOTAL_DUE
+--,(SELECT TX.IH_NET_INV_BC_AMT FROM RAIMS.GLT_INTERFACE_HEAD TX WHERE TX.IH_POLH_SYS_ID=P.POLH_SYS_ID AND TX.IH_JRNL_SOURCE='UW' AND TX.IH_JRNL_TYPE IN ('DNU','CNU')) AS TOTAL_DUE
+FROM RAIMS.INT_UW_POLH P
+WHERE P.POLH_EXTNUM='0'
+AND P.POLH_POLNUM=$P{parPolicyNumber}
+--WHERE P.POLH_POLNUM='P01FI00200283/000/00'
+--WHERE P.POLH_POLNUM='P01FI00200476/000/00']]>
+	</queryString>
+	<field name="INVOICE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INVOICE"/>
+	</field>
+	<field name="ACCOUNT_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ACCOUNT_CODE"/>
+	</field>
+	<field name="INVOICE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="INVOICE_DATE"/>
+	</field>
+	<field name="ACC_MONTH_YEAR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ACC_MONTH_YEAR"/>
+	</field>
+	<field name="CUSTOMER_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="CUSTOMER_NAME"/>
+	</field>
+	<field name="ADDRESS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ADDRESS"/>
+	</field>
+	<field name="VAT_TIN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="VAT_TIN"/>
+	</field>
+	<field name="PRODUCT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="PRODUCT"/>
+	</field>
+	<field name="POLICY_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="POLICY_NO"/>
+	</field>
+	<field name="ISSUED_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="ISSUED_DATE"/>
+	</field>
+	<field name="EFFECTIVE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EFFECTIVE_DATE"/>
+	</field>
+	<field name="EXPIRY_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="EXPIRY_DATE"/>
+	</field>
+	<field name="ADMIN_FEE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ADMIN_FEE"/>
+	</field>
+	<field name="TOTAL_DUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_DUE"/>
+	</field>
+	<field name="GROSS_PREMIUM" class="java.math.BigDecimal"/>
+	<field name="ADJUST_PREMIUM" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="802" splitType="Stretch">
+			<image>
+				<reportElement x="-20" y="245" width="595" height="274" uuid="7c1ab081-a229-4fc5-a161-7cbc639d854b"/>
+				<imageExpression><![CDATA[$P{parImageDetail}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="155" y="273" width="100" height="19" uuid="8157205a-880b-401c-b1b8-67a7b7c37b5b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ISSUED_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="145" y="254" width="123" height="20" uuid="57241625-d9cb-4301-824e-6a15eac44e5c"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVOICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="432" y="254" width="124" height="24" uuid="016ed268-cc89-43a2-bb1e-547aa1d18e3f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACCOUNT_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="430" y="416" width="104" height="20" uuid="cc339040-54c3-4d39-9888-1f55ada100b1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXPIRY_DATE}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement stretchType="RelativeToBandHeight" x="-20" y="-20" width="595" height="265" uuid="c3a7d228-9b15-4f9d-acd3-3177dea2a54a"/>
+				<imageExpression><![CDATA[$P{parImageHeader}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="440" y="275" width="130" height="16" uuid="dbba45ae-002a-42e7-b9f2-bc6e7b246a54"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ACC_MONTH_YEAR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="302" width="330" height="28" uuid="703d33b1-60f4-4896-a479-8bdc2921942c"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUSTOMER_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="330" width="349" height="30" uuid="5924ccde-15a9-4f68-855c-a0e4b5d326a0"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="45" y="416" width="120" height="20" uuid="e73bc00f-4c6a-4bd6-b2b5-315f7af8b9dd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRODUCT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="165" y="416" width="146" height="20" uuid="480e7ec2-87b1-48ce-9e33-81967c2913ec"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{POLICY_NO}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="438" y="455" width="82" height="20" uuid="83bde7ed-df99-4d3c-b6b0-a7b117b961d6"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROSS_PREMIUM}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="438" y="474" width="82" height="17" uuid="a6cda506-016b-4c8b-b71f-1affb79dbdb0"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ADMIN_FEE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="438" y="490" width="82" height="18" uuid="eadd0dd5-3936-4e24-bb7d-30515e7587f7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_DUE}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="-20" y="520" width="595" height="279" uuid="e87e7739-d36e-42af-ad7c-83a3342528f4">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$P{parImageFooter}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="107" y="573" width="123" height="20" uuid="69aa2ce8-f635-422f-bffc-341028bc147b"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INVOICE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="226" y="355" width="284" height="14" uuid="c6b8449e-8925-484e-a5db-3de22b3c7f3c"/>
+				<textElement verticalAlignment="Top">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{parVattin}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="311" y="416" width="119" height="20" uuid="0ad80135-96ba-4c29-8ba5-4eddaea1ef73"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EFFECTIVE_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
